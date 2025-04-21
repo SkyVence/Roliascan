@@ -1,7 +1,9 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { Client } from 'pg';
+import pg from 'pg';
 import * as schema from '@/schemas/index';
+
+const { Client } = pg;
 
 // Create an explicit client instance
 export const client = new Client({

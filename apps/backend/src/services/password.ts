@@ -1,10 +1,22 @@
-import bcrypt from "bcrypt";
+import { hash, compare } from "bcrypt"
 
-export async function hashPassword(plain_password: string) {
-    const hashed_password = await bcrypt.hash(plain_password, 10);
-    return hashed_password; 
+const SALT_ROUNDS = 10
+
+/**
+ * Hash a password
+ * @param password Plain text password
+ * @returns Hashed password
+ */
+export async function hashPassword(password: string): Promise<string> {
+  return hash(password, SALT_ROUNDS)
 }
 
-export async function verifyPassword(plain_password: string, hashed_password: string) {
-    return await bcrypt.compare(plain_password, hashed_password);
+/**
+ * Verify a password against a hash
+ * @param password Plain text password
+ * @param hashedPassword Hashed password
+ * @returns Boolean indicating if password is valid
+ */
+export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+  return compare(password, hashedPassword)
 }

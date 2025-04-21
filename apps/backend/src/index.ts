@@ -1,16 +1,24 @@
-import { setupFastify, setupFastifyRoutes, startFastify } from "@/modules/fastify";
-export async function bootstrap(): Promise<void> {
-    console.log(`Backend Booting up...`);
+import Fastify from "fastify"
+import { config } from "./config"
+import { setupFastify, setupFastifyRoutes, startFastify } from "./server"
+import { ZodTypeProvider, serializerCompiler, validatorCompiler } from "fastify-type-provider-zod"
 
-    const app = await setupFastify();
-    await setupFastifyRoutes(app);
-    await startFastify(app);
+// Create Fastify instance
+const fastify = Fastify({
+  logger: {
+    level: config.env.NODE_ENV === "development" ? "debug" : "info",
+  },
+}).withTypeProvider<ZodTypeProvider>()
 
-    console.log(`App setup, ready to handle requests`);
-    console.log(`-----------------------------------`);
-}
+// Set Zod as the schema validator and serializer
+fastify.setValidatorCompiler(validatorCompiler)
+fastify.setSerializerCompiler(serializerCompiler)
 
-bootstrap().catch((err) => {
-    console.error(err);
-    process.exit(1);
-});
+// Setup Fastify
+setupFastify(fastify)
+
+// Setup routes
+setupFastifyRoutes(fastify)
+
+// Start server
+startFastify(fastify)
