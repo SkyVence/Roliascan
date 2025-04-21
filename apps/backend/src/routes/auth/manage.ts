@@ -7,5 +7,5 @@ const userSchema = z.object({
 });
 
 export const manageAuthRoutes = makeRouter((app) => {
-
+    app.post('/auth/register', { schema: { body: userSchema } })
 })
