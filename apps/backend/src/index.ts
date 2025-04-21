@@ -1,15 +1,16 @@
-import fastify from 'fastify'
+import { setupFastify, setupFastifyRoutes, startFastify } from "@/modules/fastify";
+export async function bootstrap(): Promise<void> {
+    console.log(`Backend Booting up...`);
 
-const server = fastify()
+    const app = await setupFastify();
+    await setupFastifyRoutes(app);
+    await startFastify(app);
 
-server.get('/ping', async (request, reply) => {
-  return 'pong'
-})
+    console.log(`App setup, ready to handle requests`);
+    console.log(`-----------------------------------`);
+}
 
-server.listen({ port: 3001 }, (err, address) => {
-  if (err) {
-    console.error(err)
-    process.exit(1)
-  } 
-  console.log(`Server listening at ${address}`)
-})
+bootstrap().catch((err) => {
+    console.error(err);
+    process.exit(1);
+});

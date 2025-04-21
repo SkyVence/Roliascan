@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Client } from 'pg';
+import * as schema from '@/schemas/index';
 
 // Create an explicit client instance
 export const client = new Client({
@@ -11,7 +12,7 @@ export const client = new Client({
 // We might want to handle connection errors here in a real app
 await client.connect(); 
 
-// Pass the connected client to Drizzle
-export const db = drizzle(client);
+// Pass the connected client and schema to Drizzle
+export const db = drizzle(client, { schema });
 
 // Note: No longer a default export
