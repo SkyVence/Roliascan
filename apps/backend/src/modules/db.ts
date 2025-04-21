@@ -1,0 +1,17 @@
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Client } from 'pg';
+
+// Create an explicit client instance
+export const client = new Client({
+  connectionString: process.env.DATABASE_URL!,
+});
+
+// Connect the client (important for migrations)
+// We might want to handle connection errors here in a real app
+await client.connect(); 
+
+// Pass the connected client to Drizzle
+export const db = drizzle(client);
+
+// Note: No longer a default export
