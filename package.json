@@ -1,0 +1,17 @@
+{
+	"name": "roliascan-oms",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+    "packageManager": "npm@11.3.0",
+	"scripts": {
+		"dev": "turbo run dev --parallel",
+		"build": "turbo run build",
+		"lint": "turbo run lint"
+	},
+	"devDependencies": {
+		"turbo": "^2.5.0"
+	}
+}
