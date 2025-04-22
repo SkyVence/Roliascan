@@ -10,9 +10,9 @@ Currently, there is no production-hosted version of RoliaScan available. Develop
 
 This repository uses [Turborepo](https://turbo.build/repo) to manage the monorepo, which includes:
 
--   `apps/backend`: The NestJS backend application.
+-   `apps/backend`: The fastify backend api.
 -   `apps/frontend`: The Next.js frontend application.
--   `packages/`: Shared packages (e.g., UI components, configs, types).
+-   `packages/`: Shared packages (e.g., UI components, configs, types). // Not using currently bc im dumb and didnt set it up correctly. PR is accepted.
 
 ## Backend
 
@@ -56,6 +56,8 @@ This command will start the development servers for both the backend and fronten
 
 ```bash
 turbo dev
+or
+npm run dev # or yarn dev or pnpm dev // Must be at the root 
 ```
 
 **Build All Applications:**
@@ -64,4 +66,6 @@ This command will build all applications within the monorepo.
 
 ```bash
 turbo build
+or
+npm run build # or yarn build or pnpm build // Must be at the root 
 ``` 
