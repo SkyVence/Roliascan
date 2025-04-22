@@ -26,6 +26,9 @@ const envSchema = z.object({
   // UploadThing (only required if UPLOAD_METHOD is "cdn")
   UPLOADTHING_SECRET: z.string().optional(),
   UPLOADTHING_APP_ID: z.string().optional(),
+
+  // CORS
+  TRUSTED_FRONTEND_URLS: z.string().min(1), // Expect comma-separated URLs
 })
 
 // Parse and validate environment variables

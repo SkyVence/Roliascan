@@ -7,6 +7,12 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const rootDir = path.join(__dirname, "../..")
 
+// Parse trusted frontend URLs
+const trustedOrigins = env.TRUSTED_FRONTEND_URLS
+  .split(",")
+  .map(url => url.trim())
+  .filter(url => url.length > 0)
+
 // Define application config
 export const config = {
   env,
@@ -17,6 +23,7 @@ export const config = {
     host: env.HOST,
     isDev: env.NODE_ENV === "development",
     isProd: env.NODE_ENV === "production",
+    trustedOrigins,
   },
 
   // JWT

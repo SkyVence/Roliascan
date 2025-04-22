@@ -4,6 +4,22 @@ import { apiHandler, badRequest, unauthorized } from "../utils/handler"
 import * as userService from "../services/user"
 import { verifyPassword } from "../services/password"
 import { generateToken } from "../services/jwt"
+import { config } from "../config"
+
+// Helper function to convert expiration string (e.g., "7d", "1h") to seconds
+function expiresInToSeconds(expiresIn: string): number | undefined {
+  const unit = expiresIn.charAt(expiresIn.length - 1)
+  const value = parseInt(expiresIn.slice(0, -1), 10)
+  if (isNaN(value)) return undefined
+
+  switch (unit) {
+    case 's': return value
+    case 'm': return value * 60
+    case 'h': return value * 60 * 60
+    case 'd': return value * 60 * 60 * 24
+    default: return undefined
+  }
+}
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -48,7 +64,18 @@ export default async function (fastify: FastifyInstance) {
       // Generate token
       const token = generateToken(fastify, { id: user.id, role: user.role })
 
-      return { token, user }
+      // Set token in cookie
+      reply.setCookie("token", token, {
+        path: "/",
+        httpOnly: true,
+        secure: config.server.isProd,
+        signed: true,
+        maxAge: expiresInToSeconds(config.jwt.expiresIn),
+        sameSite: "lax",
+      })
+
+      // Return only user data
+      return { user: { id: user.id, email: user.email, username: user.username, role: user.role } }
     }),
   )
 
@@ -86,8 +113,18 @@ export default async function (fastify: FastifyInstance) {
       // Generate token
       const token = generateToken(fastify, { id: user.id, role: user.role })
 
+      // Set token in cookie
+      reply.setCookie("token", token, {
+        path: "/",
+        httpOnly: true,
+        secure: config.server.isProd,
+        signed: true,
+        maxAge: expiresInToSeconds(config.jwt.expiresIn),
+        sameSite: "lax",
+      })
+
+      // Return only user data (excluding password)
       return {
-        token,
         user: {
           id: user.id,
           email: user.email,

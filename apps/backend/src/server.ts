@@ -3,6 +3,7 @@ import fastifyJwt from "@fastify/jwt"
 import fastifyCors from "@fastify/cors"
 import fastifyMultipart from "@fastify/multipart"
 import fastifyStatic from "@fastify/static"
+import fastifyCookie from "@fastify/cookie"
 import { migrate } from "drizzle-orm/postgres-js/migrator"
 import { db } from "./db"
 import { config } from "./config"
@@ -28,7 +29,14 @@ import uploadRoutes from "./routes/upload"
 export function setupFastify(fastify: FastifyInstance) {
   // Register plugins
   fastify.register(fastifyCors, {
-    origin: true, // Adjust according to your needs
+    // origin: true, // Adjust according to your needs
+    origin: config.server.trustedOrigins,
+    credentials: true,
+  })
+
+  fastify.register(fastifyCookie, {
+    secret: config.jwt.secret,
+    hook: 'onRequest',
   })
 
   fastify.register(fastifyJwt, {
@@ -84,21 +92,14 @@ export function setupFastify(fastify: FastifyInstance) {
 export function setupFastifyRoutes(fastify: FastifyInstance) {
   // Register routes
   fastify.register(authRoutes, { prefix: "/auth" })
-  console.log("AuthRoute registered")
   fastify.register(userRoutes, { prefix: "/user" })
-  console.log("UserRoute registered")
   fastify.register(contentRoutes, { prefix: "/content" })
-  console.log("ContentRoute registered")
   fastify.register(chapterRoutes, { prefix: "/chapter" })
-  console.log("ChapterRoute registered")
   fastify.register(commentRoutes, { prefix: "/comment" })
-  console.log("CommentRoute registered")
   fastify.register(ratingRoutes, { prefix: "/rating" })
-  console.log("RatingRoute registered")
   fastify.register(adminRoutes, { prefix: "/admin" })
-  console.log("AdminRoute registered")
   fastify.register(uploadRoutes, { prefix: "/upload" })
-  console.log("UploadRoute registered")
+  console.log("Routes setup complete")
 
   // Health check route
   fastify.get("/health", async () => {
@@ -121,7 +122,13 @@ export async function startFastify(fastify: FastifyInstance) {
       host: config.server.host,
     })
 
-    console.log(`Server is running on ${fastify.server.address().port}`)
+    const address = fastify.server.address()
+    const port = typeof address === 'string' ? address : address?.port
+    if (port !== undefined) {
+      console.log(`Server is running on port ${port}`)
+    } else {
+      console.log(`Server is running, but address information is unavailable.`)
+    }
   } catch (err) {
     fastify.log.error(err)
     process.exit(1)
