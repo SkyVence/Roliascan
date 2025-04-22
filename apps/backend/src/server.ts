@@ -84,13 +84,21 @@ export function setupFastify(fastify: FastifyInstance) {
 export function setupFastifyRoutes(fastify: FastifyInstance) {
   // Register routes
   fastify.register(authRoutes, { prefix: "/auth" })
+  console.log("AuthRoute registered")
   fastify.register(userRoutes, { prefix: "/user" })
+  console.log("UserRoute registered")
   fastify.register(contentRoutes, { prefix: "/content" })
+  console.log("ContentRoute registered")
   fastify.register(chapterRoutes, { prefix: "/chapter" })
+  console.log("ChapterRoute registered")
   fastify.register(commentRoutes, { prefix: "/comment" })
+  console.log("CommentRoute registered")
   fastify.register(ratingRoutes, { prefix: "/rating" })
+  console.log("RatingRoute registered")
   fastify.register(adminRoutes, { prefix: "/admin" })
+  console.log("AdminRoute registered")
   fastify.register(uploadRoutes, { prefix: "/upload" })
+  console.log("UploadRoute registered")
 
   // Health check route
   fastify.get("/health", async () => {
