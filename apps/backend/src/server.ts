@@ -41,6 +41,10 @@ export function setupFastify(fastify: FastifyInstance) {
 
   fastify.register(fastifyJwt, {
     secret: config.jwt.secret,
+    cookie: {
+      cookieName: 'token',
+      signed: true
+    }
   })
 
   fastify.register(fastifyMultipart, {

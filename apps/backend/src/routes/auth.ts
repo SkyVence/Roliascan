@@ -5,6 +5,15 @@ import * as userService from "../services/user"
 import { verifyPassword } from "../services/password"
 import { generateToken } from "../services/jwt"
 import { config } from "../config"
+import type { UserRole } from "../schemas/types" // Import UserRole if needed for JwtPayload
+
+// Define or import the payload type (ensure consistency with auth.ts)
+interface JwtPayload {
+  id: string;
+  role: UserRole;
+  iat?: number;
+  exp?: number;
+}
 
 // Helper function to convert expiration string (e.g., "7d", "1h") to seconds
 function expiresInToSeconds(expiresIn: string): number | undefined {
@@ -113,12 +122,12 @@ export default async function (fastify: FastifyInstance) {
       // Generate token
       const token = generateToken(fastify, { id: user.id, role: user.role })
 
-      // Set token in cookie
+      // Set token in cookie (UNSIGNED for testing)
       reply.setCookie("token", token, {
         path: "/",
         httpOnly: true,
         secure: config.server.isProd,
-        signed: true,
+        // signed: true, // Temporarily disable signing
         maxAge: expiresInToSeconds(config.jwt.expiresIn),
         sameSite: "lax",
       })
@@ -143,10 +152,16 @@ export default async function (fastify: FastifyInstance) {
       onRequest: [fastify.authenticate],
     },
     apiHandler(async (request, reply) => {
-      const userId = request.user.id
+      // Explicitly assert the type of request.user
+      const userPayload = request.user as JwtPayload;
+      const userId = userPayload.id;
+
+      // Log the user ID obtained (optional, good for debugging)
+      request.log.info(`Fetching /me data for user ID: ${userId}`)
 
       const user = await userService.findUserById(userId)
       if (!user) {
+        request.log.warn(`User not found in DB for ID: ${userId} during /me request`)
         unauthorized(reply, "User not found")
         return
       }
