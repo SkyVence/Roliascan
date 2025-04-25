@@ -5,7 +5,7 @@
 		"apps/*",
 		"packages/*"
 	],
-    "packageManager": "npm@11.3.0",
+	"packageManager": "npm@11.3.0",
 	"scripts": {
 		"dev": "turbo run dev --parallel",
 		"build": "turbo run build",
