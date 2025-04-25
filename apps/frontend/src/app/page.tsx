@@ -1,8 +1,7 @@
-import Navigation from "@/components/navigation";
+"use client"
+import { Button } from "@/components/ui/button";
+import { usePostHog } from "@/components/PostHogProvider";
+
 export default function Home() {
-  return (
-    <div>
-      <Navigation />
-    </div>
-  );
+    return null
 }
