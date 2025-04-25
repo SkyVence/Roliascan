@@ -59,7 +59,7 @@ export default function LoginForm({
             const response = await axiosInstance.post('/auth/login', {
                 email: data.email,
                 password: data.password,
-            });
+            }, { useAuthToken: false });
 
             console.log("Login successful:", response.data);
             toast.success("Login successful! Redirecting...");

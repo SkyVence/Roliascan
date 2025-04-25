@@ -75,7 +75,7 @@ export default function RegisterForm({
                 username: data.username,
                 email: data.email,
                 password: data.password,
-            });
+            }, { useAuthToken: false });
 
             // Handle success (axios resolves on 2xx status)
             console.log("Registration successful:", response.data);
