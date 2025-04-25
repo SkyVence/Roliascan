@@ -30,7 +30,7 @@ export function setupFastify(fastify: FastifyInstance) {
   // Register plugins
   fastify.register(fastifyCors, {
     // origin: true, // Adjust according to your needs
-    origin: config.server.trustedOrigins,
+    origin: true,
     credentials: true,
   })
 
