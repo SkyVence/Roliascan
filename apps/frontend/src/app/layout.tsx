@@ -2,7 +2,7 @@
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/auth-context";
-import Navigation from "@/components/navigation";
+import { NewNavigation } from "@/components/navigation";
 import { usePathname } from "next/navigation";
 import AdminSidebar from "@/components/admin-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -25,7 +25,7 @@ function RenderNavbar({ children }: { children: React.ReactNode }) {
         );
     }
     return (
-        <Navigation />
+        <NewNavigation />
     );
 }
 
