@@ -3,10 +3,11 @@
 import Link from "next/link"
 import { useTheme } from "next-themes"
 import { Button } from "./ui/button"
-import { Sun, Moon, User, Loader2 } from "lucide-react"
+import { Sun, Moon, User, Loader2, Search } from "lucide-react"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "./ui/dropdown-menu"
 import { useAuth } from "./auth-context"
 import { AnimatedLoader } from "./ui/animated-loader"
+import { Input } from "./ui/input"
 
 function ThemeSwitcher() {
     const { theme, setTheme } = useTheme()
@@ -28,6 +29,38 @@ function AuthButtons() {
         </Button>
     }
 
+    
+    if (user?.role === "Admin") {
+        return(
+            <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                    <User className="h-[1.2rem] w-[1.2rem]" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                    <DropdownMenuLabel>{user?.username}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                        <Link href="/profile/settings">
+                            Settings
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href="/admin/panel">
+                            Admin Panel
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href="/auth/logout">
+                            Logout
+                        </Link>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+        </DropdownMenu>
+        )
+    }
+
     if (isAuthenticated) {  
         return (
             <DropdownMenu>
@@ -39,6 +72,11 @@ function AuthButtons() {
                 <DropdownMenuContent>
                         <DropdownMenuLabel>{user?.username}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                            <Link href="/profile/settings">
+                                Settings
+                            </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                             <Link href="/auth/logout">
                                 Logout
@@ -74,6 +112,17 @@ function AuthButtons() {
     )
 }
 
+//Search Bar no logic yet
+function SearchBar() {
+    return (
+        <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-[1.2rem] w-[1.2rem] -translate-y-1/2 text-muted-foreground" />
+            <Input type="text" placeholder="Search..." className="pl-10" />
+        </div>
+    )
+}
+
+
 export default function Navigation() {
     return (
         <div className="flex justify-center py-6">
@@ -92,6 +141,7 @@ export default function Navigation() {
                         </Link>
                     </div>
                     <div className="flex gap-2">
+                        <SearchBar/>
                         <ThemeSwitcher />
                         <AuthButtons />
                     </div>

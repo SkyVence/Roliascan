@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect } from "react"
+import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { AuthApiResponse, User } from "@/types/auth"
 import axiosInstance from "@/lib/axios";
 
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
-    const fetchUser = async () => {
+    const fetchUser = useCallback(async () => {
         setIsLoading(true)
         try {
             const response = await axiosInstance.get("/auth/me")
@@ -34,10 +34,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } finally {
             setIsLoading(false)
         }
-    }
+    }, [])
 
     useEffect(() => {
-        fetchUser()
+        console.log("AuthProvider mounted, fetching user...");
+        fetchUser();
     }, [])
 
     const isAuthenticated = !!user && !isLoading;
