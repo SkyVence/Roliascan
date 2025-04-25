@@ -272,17 +272,15 @@ export function NewNavigation() {
             <div className="relative w-full mx-6 rounded-lg border border-primary bg-accent/60 backdrop-blur-sm px-6 py-3 shadow-md">
                 <div className="flex items-center justify-between h-[55px]">
                     <div className="flex gap-4">
-                        <Link href="/" legacyBehavior>
+                        <Link href="/">
                             <img src="/custom/logo4.0.png" alt="logo" className="h-[30px] w-[30px]" />
                         </Link>
                         <NavigationMenu>
                             <NavigationMenuList >
                                 <NavigationMenuItem>
-                                    <Link href="/" legacyBehavior passHref>
-                                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                                        <NavigationMenuLink className={navigationMenuTriggerStyle()} href="/">
                                             Home
                                         </NavigationMenuLink>
-                                    </Link>
                                 </NavigationMenuItem>
                                 <NavigationMenuItem>
                                     <NavigationMenuTrigger>Titles</NavigationMenuTrigger>

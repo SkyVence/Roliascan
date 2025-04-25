@@ -65,12 +65,28 @@ const data = {
             url: "/admin/team-revenue",
             icon: Banknote
         }
+    ],
+    navUploads: [
+        {
+            title: "Create Content",
+            url: "/admin/create-content",
+            icon: UploadIcon
+        },
+        {
+            title: "Create Chapter",
+            url: "/admin/create-chapter",
+            icon: UploadIcon
+        },
+        {
+            title: "Upload History",
+            url: "/admin/upload-history",
+            icon: UploadIcon
+        }
     ]
 }
 
 
 export default function AdminSidebar() {
-    const pathname = usePathname()
     return (
         <Sidebar side="left" variant="inset" collapsible="offcanvas">
             <SidebarHeader>
@@ -90,6 +106,7 @@ export default function AdminSidebar() {
             <SidebarContent>
                 <NavMain items={data.navMain} />
                 <NavRevenue items={data.navRevenue} />
+                <NavUploads items={data.navUploads} />
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
@@ -143,6 +160,38 @@ function NavRevenue({
     return (
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>Revenue</SidebarGroupLabel>
+            <SidebarGroupContent className="flex flex-col gap-2">
+                <SidebarSeparator />
+                <SidebarMenu>
+                    {items.map((item) => (
+                        <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton tooltip={item.title} asChild isActive={pathname === item.url}>
+                                <a href={item.url}>
+                                    {item.icon && <item.icon />}
+                                    <span>{item.title}</span>
+                                </a>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
+            </SidebarGroupContent>
+        </SidebarGroup>
+    )
+}
+
+function NavUploads({
+    items,
+}: {
+    items: {
+        title: string
+        url: string
+        icon: LucideIcon
+    }[]
+}) {
+    const pathname = usePathname()
+    return (
+        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+            <SidebarGroupLabel>Uploads</SidebarGroupLabel>
             <SidebarGroupContent className="flex flex-col gap-2">
                 <SidebarSeparator />
                 <SidebarMenu>
