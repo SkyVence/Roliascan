@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useTheme } from "next-themes";
 import { Separator } from "./ui/separator";
+import { usePathname } from "next/navigation";
 
 const data = {
     navMain: [
@@ -69,6 +70,7 @@ const data = {
 
 
 export default function AdminSidebar() {
+    const pathname = usePathname()
     return (
         <Sidebar side="left" variant="inset" collapsible="offcanvas">
             <SidebarHeader>
@@ -106,6 +108,7 @@ function NavMain({
         icon?: LucideIcon
     }[]
 }) {
+    const pathname = usePathname()
     return (
         <SidebarGroup>
             <SidebarGroupContent className="flex flex-col gap-2">
@@ -113,7 +116,7 @@ function NavMain({
                 <SidebarMenu>
                     {items.map((item) => (
                         <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton tooltip={item.title} asChild>
+                            <SidebarMenuButton tooltip={item.title} asChild isActive={pathname === item.url}>
                                 <a href={item.url}>
                                     {item.icon && <item.icon />}
                                     <span>{item.title}</span>
@@ -136,6 +139,7 @@ function NavRevenue({
         icon: LucideIcon
     }[]
 }) {
+    const pathname = usePathname()
     return (
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>Revenue</SidebarGroupLabel>
@@ -144,7 +148,7 @@ function NavRevenue({
                 <SidebarMenu>
                     {items.map((item) => (
                         <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton tooltip={item.title} asChild>
+                            <SidebarMenuButton tooltip={item.title} asChild isActive={pathname === item.url}>
                                 <a href={item.url}>
                                     {item.icon && <item.icon />}
                                     <span>{item.title}</span>
@@ -170,13 +174,14 @@ function NavSecondary({
         icon: LucideIcon
     }[]
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+    const pathname = usePathname()
     return (
         <SidebarGroup {...props}>
             <SidebarGroupContent>
                 <SidebarMenu>
                     {items.map((item) => (
                         <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton asChild isActive={pathname === item.url}>
                                 <a href={item.url}>
                                     <item.icon />
                                     <span>{item.title}</span>
