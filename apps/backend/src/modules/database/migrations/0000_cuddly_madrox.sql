@@ -21,11 +21,13 @@ CREATE TABLE "titles" (
 	"title" varchar(255) NOT NULL,
 	"slug" varchar(255) NOT NULL,
 	"description" text,
-	"authorId" uuid,
-	"uploaderId" uuid,
+	"authorId" uuid NOT NULL,
+	"uploaderId" uuid NOT NULL,
 	"status" "titleStatus" DEFAULT 'ongoing' NOT NULL,
 	"type" "titleType" DEFAULT 'manga' NOT NULL,
-	"year" integer,
+	"year" integer NOT NULL,
+	"chapterCount" integer DEFAULT 0 NOT NULL,
+	"volumeCount" integer DEFAULT 0 NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"updatedAt" timestamp NOT NULL
 );

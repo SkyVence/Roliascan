@@ -30,6 +30,11 @@ export const config = {
     expiresIn: env.JWT_EXPIRES_IN,
   },
 
+  // CORS
+  cors: {
+    origin: env.CORS_ORIGIN,
+  },
+
 }
 
 export type Config = typeof config

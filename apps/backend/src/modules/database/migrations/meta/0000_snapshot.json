@@ -1,5 +1,5 @@
 {
-  "id": "8bee76f4-5476-4fb5-8244-c3e235f0e97e",
+  "id": "31552774-0827-462c-8968-27bee0cc8f46",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -111,13 +111,13 @@
           "name": "authorId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "uploaderId": {
           "name": "uploaderId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "status": {
           "name": "status",
@@ -139,7 +139,21 @@
           "name": "year",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "chapterCount": {
+          "name": "chapterCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "volumeCount": {
+          "name": "volumeCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
         },
         "createdAt": {
           "name": "createdAt",

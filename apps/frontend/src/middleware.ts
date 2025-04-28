@@ -1,23 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
-import axiosInstance from './lib/axios';
 
 export default async function middleware(request: NextRequest) {
-    const token = request.cookies.get('token')?.value;
+    const session = request.cookies.get('session')?.value;
     let isLoggedIn = false;
-    if (token) {
+    if (session) {
         try {
-            const response = await axiosInstance.get("/auth/me", {
+            const response = await axios.get("/auth/me", {
                 headers: {
-                    Cookie: `token=${token}`,
+                    Cookie: `session=${session}`,
                 },
-            });
+            })
             if (response.status === 200) {
                 isLoggedIn = true;
             }
         } catch (error) {
             isLoggedIn = false;
-            console.error('Middleware auth check failed:', error instanceof axios.AxiosError ? error.message : error);
+            console.error('Middleware auth check failed:', error instanceof axios.AxiosError ? error.response?.data : error);
         }
     }
 

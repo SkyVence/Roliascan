@@ -21,6 +21,9 @@ const envSchema = z.object({
   // JWT
   JWT_SECRET: z.string().min(1),
   JWT_EXPIRES_IN: z.string().transform((val) => parseInt(val)),
+
+  // CORS
+  CORS_ORIGIN: z.string(),
 })
 
 // Parse and validate environment variables

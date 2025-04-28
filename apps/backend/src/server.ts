@@ -8,6 +8,7 @@ import fastifyFormbody from "@fastify/formbody";
 import { TitlesController } from "./controllers/titles.controllers";
 import { AuthorsController } from "./controllers/authors.controllers";
 import { ChaptersController } from "./controllers/chapters.controllers";
+import cors from "@fastify/cors";
 /**
  * Setup Fastify
  * @param fastify - Fastify instance
@@ -15,6 +16,10 @@ import { ChaptersController } from "./controllers/chapters.controllers";
  */
 export async function setupFastify(fastify: FastifyInstance) {
     // Register Plugins HERE 
+    await fastify.register(cors, {
+        origin: config.cors.origin,
+        credentials: true,
+    })
     await fastify.register(fastifyFormbody)
     await fastify.register(fastifyCookie, {
         hook: "onRequest",
@@ -33,7 +38,6 @@ export async function setupFastify(fastify: FastifyInstance) {
  * @returns Fastify instance
  */
 export async function setupFastifyRoutes(fastify: FastifyInstance) {
-    // Use fastify.after() to ensure decorators from previous plugins are available
     await fastify.register(AuthController, {
         prefix: "/auth",
     });

@@ -25,7 +25,9 @@ function RenderNavbar({ children }: { children: React.ReactNode }) {
         );
     }
     if (pathname.startsWith("/auth")) {
-        return null
+        return (
+            <>{children}</>
+        )
     }
     return (
         <NewNavigation />
@@ -49,7 +51,6 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body>
-                <PostHogProvider>
                     <ThemeProvider
                         attribute="class"
                         defaultTheme="dark"
@@ -62,7 +63,6 @@ export default function RootLayout({
                             </RenderNavbar>
                         </AuthProvider>
                     </ThemeProvider>
-                </PostHogProvider>
             </body>
         </html>
     );
