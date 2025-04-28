@@ -5,7 +5,7 @@ import db from "@/modules/database";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { hashPassword, verifyPassword } from "@/utils/password";
-import { deleteSessionToken, saveSessionData } from "@/utils/cookie";
+import { deleteSessionToken, saveSessionData, updateSessionDataOnly } from "@/utils/cookie";
 import { config } from "@/config";
 import { v4 as uuidv4 } from "uuid";
 
@@ -257,7 +257,7 @@ export async function AuthController(fastify: FastifyInstance) {
                 if (sessionId) {
                     try {
                          // Update session data in Redis
-                        await saveSessionData(dbUserData, sessionId);
+                        await updateSessionDataOnly(dbUserData, sessionId);
                     } catch (error) {
                         console.error("Error updating session token:", error);
                         // Don't fail the request, but log the error

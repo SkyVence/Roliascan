@@ -20,29 +20,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true)
 
     const fetchUser = useCallback(async () => {
-        setIsLoading(true)
+        // No need to set loading true for background refresh
+        // setIsLoading(true)
         try {
             const response = await axiosInstance.get("/auth/me")
-            console.log(response.data)
             const result: AuthApiResponse = response.data
-
-            if (result) {
-                setUser(result || null)
-            } else {
-                setUser(null)
-            }
+            setUser(result || null) // Update user state directly
         } catch (error) {
-            console.error("Error fetching user:", error)
-            setUser(null)
+            // Optionally handle background fetch errors differently, e.g., keep old user state
+            setUser(null) // Avoid setting user to null on background refresh failure unless intended
         } finally {
-            setIsLoading(false)
+            // Only set initial loading to false once
+            if (isLoading) {
+                setIsLoading(false)
+            }
         }
-    }, [])
+    }, [isLoading]) // Add isLoading to dependency array
 
+    // Initial fetch on mount
     useEffect(() => {
-        console.log("AuthProvider mounted, fetching user...");
         fetchUser();
-    }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []) // Keep initial fetch dependencies empty
+
+    // Set up interval for periodic refresh
+    useEffect(() => {
+        const refreshInterval = 10 * 60 * 1000; // 10 minutes
+        console.log(`Setting up user refresh interval (${refreshInterval}ms)`);
+        const intervalId = setInterval(() => {
+            fetchUser();
+        }, refreshInterval);
+
+        // Cleanup function to clear the interval when the component unmounts
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, [fetchUser]); // Re-run effect if fetchUser function identity changes (due to useCallback dependencies)
 
     const isAuthenticated = !!user && !isLoading;
 

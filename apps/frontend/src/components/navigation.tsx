@@ -9,9 +9,8 @@ import { useAuth } from "./auth-context"
 import { AnimatedLoader } from "./ui/animated-loader"
 import { Input } from "./ui/input"
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "./ui/navigation-menu-navbar"
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { cn } from "@/lib/utils"
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert"
 
 function ThemeSwitcher() {
     const { theme, setTheme } = useTheme()
@@ -34,7 +33,7 @@ function AuthButtons() {
     }
 
 
-    if (user?.role === "Admin") {
+    if (user?.role === "admin") {
         return (
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -46,13 +45,13 @@ function AuthButtons() {
                     <DropdownMenuLabel>{user?.username}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                        <Link href="/profile/settings">
-                            Settings
+                        <Link href="/admin/panel">
+                            Admin Panel
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                        <Link href="/admin/panel">
-                            Admin Panel
+                        <Link href="/profile/settings">
+                            Settings
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -128,143 +127,66 @@ function SearchBar() {
 
 const categories: { title: string; href: string; description: string }[] = [
     {
-      title: "Comics",
-      href: "/comics",
-      description:
-        "Read your favorite comics with highest quality.",
+        title: "Comics",
+        href: "/comics",
+        description:
+            "Read your favorite comics with highest quality.",
     },
     {
-      title: "Manhwa",
-      href: "/manhwa",
-      description:
-        "Read your favorite manhwa with highest quality.",
+        title: "Manhwa",
+        href: "/manhwa",
+        description:
+            "Read your favorite manhwa with highest quality.",
     },
     {
-      title: "Manhua",
-      href: "/manhua",
-      description:
-        "Read your favorite manhua with highest quality.",
+        title: "Manhua",
+        href: "/manhua",
+        description:
+            "Read your favorite manhua with highest quality.",
     },
     {
-      title: "Webtoon",
-      href: "/webtoon",
-      description: "Read your favorite webtoon with highest quality.",
+        title: "Webtoon",
+        href: "/webtoon",
+        description: "Read your favorite webtoon with highest quality.",
     },
 ]
 
 const community: { title: string; href: string; description: string }[] = [
     {
-      title: "Discord",
-      href: "/discord",
-      description:
-        "Join our Discord server to chat with other users.",
+        title: "Discord",
+        href: "/discord",
+        description:
+            "Join our Discord server to chat with other users.",
     },
     {
-      title: "Twitter",
-      href: "/twitter",
-      description:
-        "Follow us on Twitter to get the latest news and updates.",
+        title: "Twitter",
+        href: "/twitter",
+        description:
+            "Follow us on Twitter to get the latest news and updates.",
     },
     {
-      title: "Instagram",
-      href: "/instagram",
-      description:
-        "Follow us on Instagram to get the latest news and updates.",
+        title: "Instagram",
+        href: "/instagram",
+        description:
+            "Follow us on Instagram to get the latest news and updates.",
     },
     {
-      title: "Forum",
-      href: "/forum",
-      description: "Join our forum to discuss your favorite titles.",
+        title: "Forum",
+        href: "/forum",
+        description: "Join our forum to discuss your favorite titles.",
     },
-  ]
+]
 
 type BannerType = "default" | "destructive" | "info" | "warning"
 
 interface BannerData {
-  id: string
-  message: string
-  title: string
-  type: BannerType
-  active: boolean
-  expiresAt: string | null
+    id: string
+    message: string
+    title: string
+    type: BannerType
+    active: boolean
+    expiresAt: string | null
 }
-
-function GlobalAlert() {
-    const [banner, setBanner] = useState<BannerData | null>(null)
-    const [visible, setVisible] = useState(false)
-
-    useEffect(() => {
-        const fetchBanner = async () => {
-            const data = {
-                id: "1",
-                message: "Welcome to our website!",
-                title: "Welcome",
-                type: "default" as BannerType,
-                active: true,
-                expiresAt: null
-            }
-
-            if (!data) return
-
-            if (data.expiresAt && new Date(data.expiresAt) < new Date()) {
-                return
-            }
-
-            const dismissedBanners = JSON.parse(localStorage.getItem("dismissedBanners") || "[]")
-            if (dismissedBanners.includes(data.id)) {
-                return
-            }
-
-            setBanner(data)
-            setVisible(true)
-    
-        }
-
-        fetchBanner()
-    }, [])
-    
-    const dismissBanner = () => {
-        if (!banner) return
-    
-        setVisible(false)
-    
-        // Store dismissed banner ID in localStorage
-        const dismissedBanners = JSON.parse(localStorage.getItem("dismissedBanners") || "[]")
-        dismissedBanners.push(banner.id)
-        localStorage.setItem("dismissedBanners", JSON.stringify(dismissedBanners))
-      }
-    
-      if (!visible || !banner) return null
-    
-      const variantMap: Record<BannerType, string> = {
-        default: "",
-        destructive: "destructive",
-        info: "border border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-50",
-        warning:
-          "border border-yellow-200 bg-yellow-50 text-yellow-900 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-50",
-      }
-
-      return (
-        <Alert
-        variant={banner.type === "info" || banner.type === "warning" ? "default" : banner.type}
-        className={cn("relative", banner.type === "info" || banner.type === "warning" ? variantMap[banner.type] : "")}
-      >
-        <AlertTitle>{banner.title}</AlertTitle>
-        <AlertDescription>{banner.message}</AlertDescription>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-2 top-2"
-          onClick={dismissBanner}
-          aria-label="Dismiss banner"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </Alert>
-      )
-    
-}
-
 
 export function NewNavigation() {
     return (
@@ -278,9 +200,11 @@ export function NewNavigation() {
                         <NavigationMenu>
                             <NavigationMenuList >
                                 <NavigationMenuItem>
-                                        <NavigationMenuLink className={navigationMenuTriggerStyle()} href="/">
+                                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                        <Link href="/">
                                             Home
-                                        </NavigationMenuLink>
+                                        </Link>
+                                    </NavigationMenuLink>
                                 </NavigationMenuItem>
                                 <NavigationMenuItem>
                                     <NavigationMenuTrigger>Titles</NavigationMenuTrigger>
@@ -288,7 +212,7 @@ export function NewNavigation() {
                                         <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                                             <li className="row-span-3">
                                                 <NavigationMenuLink asChild>
-                                                    <a
+                                                    <Link
                                                         className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                                                         href="/"
                                                     >
@@ -297,9 +221,9 @@ export function NewNavigation() {
                                                             Roliascan
                                                         </div>
                                                         <p className="text-sm leading-tight text-muted-foreground">
-                                                        Read your favorite manhwa, manhua, comics with highest quality. the girl from a random chatting, huashan sect greatest genius, my crazy boss....
+                                                            Read your favorite manhwa, manhua, comics with highest quality. the girl from a random chatting, huashan sect greatest genius, my crazy boss....
                                                         </p>
-                                                    </a>
+                                                    </Link>
                                                 </NavigationMenuLink>
                                             </li>
                                             <ListItem href="/latest-updates" title="Latest Updates">
@@ -317,32 +241,29 @@ export function NewNavigation() {
                                 <NavigationMenuItem>
                                     <NavigationMenuTrigger>Categories</NavigationMenuTrigger>
                                     <NavigationMenuContent>
-                                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                                        {categories.map((category) => (
-                                            <ListItem key={category.title} href={category.href} title={category.title}>
-                                                {category.description}
-                                            </ListItem>
-                                        ))}
-                                    </ul>
+                                        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                                            {categories.map((category) => (
+                                                <ListItem key={category.title} href={category.href} title={category.title}>
+                                                    {category.description}
+                                                </ListItem>
+                                            ))}
+                                        </ul>
                                     </NavigationMenuContent>
                                 </NavigationMenuItem>
                                 <NavigationMenuItem>
                                     <NavigationMenuTrigger>Community</NavigationMenuTrigger>
                                     <NavigationMenuContent>
-                                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                                        {community.map((community) => (
-                                            <ListItem key={community.title} href={community.href} title={community.title}>
-                                                {community.description}
-                                            </ListItem>
-                                        ))}
-                                    </ul>
+                                        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                                            {community.map((community) => (
+                                                <ListItem key={community.title} href={community.href} title={community.title}>
+                                                    {community.description}
+                                                </ListItem>
+                                            ))}
+                                        </ul>
                                     </NavigationMenuContent>
                                 </NavigationMenuItem>
                             </NavigationMenuList>
                         </NavigationMenu>
-                    </div>
-                    <div className="flex-1 flex justify-center px-4">
-                        <GlobalAlert />
                     </div>
                     <div className="flex gap-2">
                         <SearchBar />
@@ -356,14 +277,15 @@ export function NewNavigation() {
 }
 
 const ListItem = React.forwardRef<
-    React.ElementRef<"a">,
-    React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
+    React.ElementRef<typeof Link>,
+    React.ComponentPropsWithoutRef<typeof Link> & { title?: string }
+>(({ className, title, children, href, ...props }, ref) => {
     return (
         <li>
             <NavigationMenuLink asChild>
-                <a
+                <Link
                     ref={ref}
+                    href={href || "#"}
                     className={cn(
                         "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
                         className
@@ -374,7 +296,7 @@ const ListItem = React.forwardRef<
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                         {children}
                     </p>
-                </a>
+                </Link>
             </NavigationMenuLink>
         </li>
     )
