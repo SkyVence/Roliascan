@@ -1,5 +1,6 @@
+name: roliascan-backend
 services:
-  database:
+  db:
     image: postgres
     restart: always
     environment:
@@ -9,7 +10,16 @@ services:
       - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - redis_data:/data
+      - ./redis.conf:/etc/redis/redis.conf
 
 volumes:
   postgres_data:
-
+  redis_data:

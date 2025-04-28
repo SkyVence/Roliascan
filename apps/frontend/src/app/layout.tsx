@@ -24,6 +24,9 @@ function RenderNavbar({ children }: { children: React.ReactNode }) {
             </SidebarProvider>
         );
     }
+    if (pathname.startsWith("/auth")) {
+        return null
+    }
     return (
         <NewNavigation />
     );

@@ -11,24 +11,16 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
   HOST: z.string().default("0.0.0.0"),
 
-  // JWT
-  JWT_SECRET: z.string().min(1),
-  JWT_EXPIRES_IN: z.string().default("7d"),
-
   // Database
   DATABASE_URL: z.string().min(1),
+  REDIS_HOST: z.string().default("localhost"),
+  REDIS_PORT: z.coerce.number().default(6379),
+  REDIS_PASSWORD: z.string(),
 
-  // Upload
-  UPLOAD_DIR: z.string().default("uploads"),
-  MAX_FILE_SIZE: z.coerce.number().default(10 * 1024 * 1024), // 10MB
-  UPLOAD_METHOD: z.enum(["server", "cdn"]).default("server"),
 
-  // UploadThing (only required if UPLOAD_METHOD is "cdn")
-  UPLOADTHING_SECRET: z.string().optional(),
-  UPLOADTHING_APP_ID: z.string().optional(),
-
-  // CORS
-  TRUSTED_FRONTEND_URLS: z.string().min(1), // Expect comma-separated URLs
+  // JWT
+  JWT_SECRET: z.string().min(1),
+  JWT_EXPIRES_IN: z.string().transform((val) => parseInt(val)),
 })
 
 // Parse and validate environment variables

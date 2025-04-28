@@ -1,17 +1,4 @@
 import { env } from "./env"
-import path from "path"
-import { fileURLToPath } from "url"
-
-// Get the directory name
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const rootDir = path.join(__dirname, "../..")
-
-// Parse trusted frontend URLs
-const trustedOrigins = env.TRUSTED_FRONTEND_URLS
-  .split(",")
-  .map(url => url.trim())
-  .filter(url => url.length > 0)
 
 // Define application config
 export const config = {
@@ -23,7 +10,18 @@ export const config = {
     host: env.HOST,
     isDev: env.NODE_ENV === "development",
     isProd: env.NODE_ENV === "production",
-    trustedOrigins,
+  },
+
+  // Database
+  db: {
+    url: env.DATABASE_URL,
+  },
+
+  // Redis
+  redis: {
+    host: env.REDIS_HOST,
+    port: env.REDIS_PORT,
+    password: env.REDIS_PASSWORD,
   },
 
   // JWT
@@ -32,43 +30,6 @@ export const config = {
     expiresIn: env.JWT_EXPIRES_IN,
   },
 
-  // Database
-  db: {
-    url: env.DATABASE_URL,
-  },
-
-  // Paths
-  paths: {
-    root: rootDir,
-    uploads: path.join(rootDir, env.UPLOAD_DIR),
-    migrations: path.join(rootDir, "src/schemas/migrations"),
-  },
-
-  // Upload
-  upload: {
-    maxFileSize: env.MAX_FILE_SIZE,
-    method: env.UPLOAD_METHOD,
-    uploadthing: {
-      secret: env.UPLOADTHING_SECRET,
-      appId: env.UPLOADTHING_APP_ID,
-    },
-  },
-
-  // Roles and permissions
-  roles: {
-    admin: "admin",
-    moderator: "moderator",
-    uploader: "uploader",
-    user: "user",
-  },
-
-  // Role-based permissions
-  rolePermissions: {
-    admin: ["*"], // Admin can do everything
-    moderator: ["create:content", "update:content", "create:chapter", "update:chapter", "delete:comment", "mute:user"],
-    uploader: ["create:content", "update:content", "create:chapter", "update:chapter"],
-    user: [], // Regular users have no special permissions
-  },
 }
 
 export type Config = typeof config
