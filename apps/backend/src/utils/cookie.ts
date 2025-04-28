@@ -8,7 +8,7 @@ export type UserPayload = {
     role: string;
 }
 
-export async function generateSessionToken(userPayload: UserPayload, sessionId: string) {
+export async function saveSessionData(userPayload: UserPayload, sessionId: string) {
     
     try {
         const storeSession = await redisClient.setex(`session:${sessionId}`, config.jwt.expiresIn, JSON.stringify(userPayload));

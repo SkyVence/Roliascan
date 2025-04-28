@@ -5,7 +5,7 @@ import db from "@/modules/database";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { hashPassword, verifyPassword } from "@/utils/password";
-import { deleteSessionToken, generateSessionToken } from "@/utils/cookie";
+import { deleteSessionToken, saveSessionData } from "@/utils/cookie";
 import { config } from "@/config";
 import { v4 as uuidv4 } from "uuid";
 
@@ -74,7 +74,7 @@ export async function AuthController(fastify: FastifyInstance) {
                 const userResponse = user[0];
 
                 const sessionId = uuidv4();
-                const generatedSession = await generateSessionToken(userResponse, sessionId);
+                const generatedSession = await saveSessionData(userResponse, sessionId);
                 if (!generatedSession) {
                     return reply.status(500).send({ message: "Internal server error" });
                 }
@@ -169,7 +169,7 @@ export async function AuthController(fastify: FastifyInstance) {
             }
 
             const sessionId = uuidv4();
-            const generatedSession = await generateSessionToken(sessionPayload, sessionId);
+            const generatedSession = await saveSessionData(sessionPayload, sessionId);
             if (!generatedSession) {
                 return reply.status(500).send({ message: "Internal server error" });
             }
@@ -225,9 +225,53 @@ export async function AuthController(fastify: FastifyInstance) {
         },
         preHandler: fastify.authenticate,
         handler: async (request, reply) => {
-            const user = request.CurrentUser;
+            const { userId } = request.CurrentUser;
+            const user = await db.query.usersTable.findFirst({
+                where: eq(usersTable.id, userId)
+            });
+            if (!user) {
+                // Session exists but user doesn't? Clear cookie and session.
+                const sessionId = request.cookies.session;
+                if (sessionId) {
+                    await deleteSessionToken(sessionId);
+                    reply.clearCookie("session");
+                }
+                return reply.status(400).send({ message: "User associated with session not found" });
+            }
+
+            // Compare DB data with session data
+            const currentUserData = request.CurrentUser;
+            const dbUserData = {
+                userId: user.id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+            };
+
+            const needsUpdate = dbUserData.username !== currentUserData.username ||
+                               dbUserData.email !== currentUserData.email ||
+                               dbUserData.role !== currentUserData.role;
+
+            if (needsUpdate) {
+                const sessionId = request.cookies.session;
+                if (sessionId) {
+                    try {
+                         // Update session data in Redis
+                        await saveSessionData(dbUserData, sessionId);
+                    } catch (error) {
+                        console.error("Error updating session token:", error);
+                        // Don't fail the request, but log the error
+                    }
+                } else {
+                     // Should not happen if authenticate preHandler passed, but handle defensively
+                     console.error("/me route: Session ID cookie missing after successful authentication.");
+                }
+
+            }
+
+            // Always return the fresh data from the database
             return reply.status(200).send({
-                userId: user.userId,
+                userId: user.id,
                 username: user.username,
                 email: user.email,
                 role: user.role,
