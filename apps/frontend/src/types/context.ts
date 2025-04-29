@@ -3,6 +3,9 @@ export type UserContextType = {
     username: string;
     email: string;
     role: string;
+    teamRole: {
+        [teamId: string]: string;
+    }
 }
 
 export interface AuthContextType {

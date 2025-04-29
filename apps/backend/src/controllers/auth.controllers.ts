@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { usersTable } from "@/modules/database/schema/users.schema";
+import { teamMembersTable } from "@/modules/database/schema/teamMembers.schema";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import db from "@/modules/database";
 import { z } from "zod";
@@ -74,7 +75,14 @@ export async function AuthController(fastify: FastifyInstance) {
                 const userResponse = user[0];
 
                 const sessionId = uuidv4();
-                const generatedSession = await saveSessionData(userResponse, sessionId);
+                const sessionPayload = {
+                    userId: userResponse.userId,
+                    username: userResponse.username,
+                    email: userResponse.email,
+                    role: userResponse.role,
+                    teamRole: {} // Empty map since new users don't belong to any team
+                };
+                const generatedSession = await saveSessionData(sessionPayload, sessionId);
                 if (!generatedSession) {
                     return reply.status(500).send({ message: "Internal server error" });
                 }
@@ -119,7 +127,8 @@ export async function AuthController(fastify: FastifyInstance) {
                     username: z.string(),
                     email: z.string().email(),
                     role: z.string(),
-                    createdAt: z.string()
+                    createdAt: z.string(),
+                    teamRole: z.record(z.string())
                 }),
                 401: z.object({
                     message: z.string()
@@ -156,11 +165,15 @@ export async function AuthController(fastify: FastifyInstance) {
                 return reply.status(401).send({ message: "Invalid username or email is incorrect" });
             }
 
+            // Fetch user's team roles
+            const userTeamRoles = await fetchUserTeamRoles(user.id);
+
             const sessionPayload = {
                 userId: user.id,
                 username: user.username,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                teamRole: userTeamRoles
             }
 
             const isPasswordValid = await verifyPassword(password, user.password);
@@ -186,7 +199,8 @@ export async function AuthController(fastify: FastifyInstance) {
                 username: user.username,
                 email: user.email,
                 role: user.role,
-                createdAt: user.createdAt.toISOString() 
+                createdAt: user.createdAt.toISOString(),
+                teamRole: userTeamRoles
             })
         }
     })
@@ -214,6 +228,7 @@ export async function AuthController(fastify: FastifyInstance) {
                     username: z.string(),
                     email: z.string().email(),
                     role: z.string(),
+                    teamRole: z.record(z.string())
                 }),
                 400: z.object({
                     message: z.string()
@@ -239,6 +254,9 @@ export async function AuthController(fastify: FastifyInstance) {
                 return reply.status(400).send({ message: "User associated with session not found" });
             }
 
+            // Fetch user's team roles
+            const userTeamRoles = await fetchUserTeamRoles(user.id);
+
             // Compare DB data with session data
             const currentUserData = request.CurrentUser;
             const dbUserData = {
@@ -246,11 +264,13 @@ export async function AuthController(fastify: FastifyInstance) {
                 username: user.username,
                 email: user.email,
                 role: user.role,
+                teamRole: userTeamRoles
             };
 
             const needsUpdate = dbUserData.username !== currentUserData.username ||
                                dbUserData.email !== currentUserData.email ||
-                               dbUserData.role !== currentUserData.role;
+                               dbUserData.role !== currentUserData.role || 
+                               dbUserData.teamRole !== currentUserData.teamRole;
 
             if (needsUpdate) {
                 const sessionId = request.cookies.session;
@@ -266,7 +286,6 @@ export async function AuthController(fastify: FastifyInstance) {
                      // Should not happen if authenticate preHandler passed, but handle defensively
                      console.error("/me route: Session ID cookie missing after successful authentication.");
                 }
-
             }
 
             // Always return the fresh data from the database
@@ -275,7 +294,33 @@ export async function AuthController(fastify: FastifyInstance) {
                 username: user.username,
                 email: user.email,
                 role: user.role,
+                teamRole: userTeamRoles
             })
         }
     })
+}
+
+// Helper function to fetch user's team roles
+async function fetchUserTeamRoles(userId: string): Promise<Record<string, string>> {
+    try {
+        // Fetch teams the user belongs to along with their roles
+        const userTeams = await db.query.teamMembersTable.findMany({
+            where: eq(teamMembersTable.userId, userId),
+            columns: {
+                teamId: true,
+                role: true
+            }
+        });
+
+        // Convert to a map of teamId -> role
+        const teamRoleMap: Record<string, string> = {};
+        userTeams.forEach(team => {
+            teamRoleMap[team.teamId] = team.role;
+        });
+
+        return teamRoleMap;
+    } catch (error) {
+        console.error("Error fetching user team roles:", error);
+        return {}; // Return empty object if there's an error
+    }
 }

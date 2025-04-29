@@ -6,6 +6,9 @@ export type UserPayload = {
     email: string;
     username: string;
     role: string;
+    teamRole: {
+        [teamId: string]: string;
+    }
 }
 
 export async function saveSessionData(userPayload: UserPayload, sessionId: string) {

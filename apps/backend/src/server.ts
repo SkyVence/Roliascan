@@ -5,9 +5,6 @@ import fastifyJwt from "@fastify/jwt";
 import { AuthMiddleware, PermissionMiddleware } from "./middleware";
 import { AuthController } from "./controllers/auth.controllers";
 import fastifyFormbody from "@fastify/formbody";
-import { TitlesController } from "./controllers/titles.controllers";
-import { AuthorsController } from "./controllers/authors.controllers";
-import { ChaptersController } from "./controllers/chapters.controllers";
 import cors from "@fastify/cors";
 /**
  * Setup Fastify
@@ -41,9 +38,6 @@ export async function setupFastifyRoutes(fastify: FastifyInstance) {
     await fastify.register(AuthController, {
         prefix: "/auth",
     });
-    await fastify.register(TitlesController)
-    await fastify.register(AuthorsController)
-    await fastify.register(ChaptersController)
 }
 
 /**
