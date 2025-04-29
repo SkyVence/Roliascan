@@ -258,4 +258,88 @@ export async function TitleController(fastify: FastifyInstance) {
             }
         }
     })
+    fastify.withTypeProvider<ZodTypeProvider>().patch("/title/:id", {
+        schema: {
+            tags: ["title"],
+            summary: "Update a title",
+            description: "Update a title with the provided details",
+            params: z.object({
+                id: z.string(),
+            }),
+            body: z.object({
+                title: z.string().min(3).optional(),
+                slug: z.string().min(3).optional(),
+                description: z.string().optional(),
+                status: z.enum(["ongoing", "completed", "cancelled", "hiatus"]).optional(),
+                type: z.enum(["manga", "manhwa", "manhua", "comic", "other"]).optional(),
+                year: z.number().optional(),
+                chapterCount: z.number().optional(),
+                volumeCount: z.number().optional(),
+                authorId: z.string().uuid().optional(),
+                uploaderId: z.string().uuid().optional(),
+                teamId: z.string().optional(), // Optional because it's not required for the user to be in a team
+            }),
+            response: {
+                200: z.object({
+                    message: z.string(),
+                }),
+                400: z.object({
+                    message: z.string(),
+                }),
+            }
+        },
+        preHandler: [fastify.authenticate, fastify.hasRole("admin"), fastify.hasTeamRole("moderator")],
+        handler: async (request, reply) => {
+            const { id } = request.params;
+            const { title, slug, description, status, type, year, chapterCount, volumeCount, authorId, uploaderId, teamId } = request.body;
+            try {
+                const result = await db.update(titlesTable).set({
+                    title,
+                    slug,
+                    description,
+                }).where(eq(titlesTable.id, id)).returning();
+                if (!result || result.length === 0) {
+                    return reply.status(500).send({ message: "Failed to update title" });
+                }
+                return reply.status(200).send({
+                    message: "Title updated successfully",
+                });
+            } catch (error) {
+                return reply.status(500).send({ message: "Error updating title" });
+            }
+        }
+    });
+    fastify.withTypeProvider<ZodTypeProvider>().delete("/title/:id", {
+        schema: {
+            tags: ["title"],
+            summary: "Delete a title",
+            description: "Delete a title with the provided details",
+            params: z.object({
+                id: z.string(),
+            }),
+            response: {
+                200: z.object({
+                    message: z.string(),
+                }),
+                400: z.object({
+                    message: z.string(),
+                }),
+            }
+        },
+        preHandler: [fastify.authenticate, fastify.hasRole("admin")],
+        handler: async (request, reply) => {
+            const { id } = request.params;
+            try {
+                const result = await db.delete(titlesTable).where(eq(titlesTable.id, id)).returning();
+                if (!result || result.length === 0) {
+                    return reply.status(500).send({ message: "Failed to delete title" });
+                }
+                return reply.status(200).send({
+                    message: "Title deleted successfully",
+                });
+            } catch (error) {
+                return reply.status(500).send({ message: "Error deleting title" });
+            }
+        }
+    });
 }
