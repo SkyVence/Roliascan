@@ -2,7 +2,7 @@ import { FastifyInstance } from "fastify";
 import { config } from "./config/index";
 import { fastifyCookie } from "@fastify/cookie";
 import fastifyJwt from "@fastify/jwt";
-import { AuthMiddleware, PermissionMiddleware } from "./middleware";
+import { AuthMiddleware, TeamRoleMiddleware, UserRoleMiddleware } from "./middleware";
 import { AuthController } from "./controllers/auth.controllers";
 import fastifyFormbody from "@fastify/formbody";
 import cors from "@fastify/cors";
@@ -26,7 +26,8 @@ export async function setupFastify(fastify: FastifyInstance) {
         secret: config.jwt.secret,
     });
     AuthMiddleware(fastify);
-    PermissionMiddleware(fastify);
+    TeamRoleMiddleware(fastify);
+    UserRoleMiddleware(fastify);
 }
 
 /**

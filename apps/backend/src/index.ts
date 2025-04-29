@@ -10,7 +10,8 @@ import { UserPayload } from "./utils/cookie";
 declare module 'fastify' {
     interface FastifyInstance {
       authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
-      hasPermission: (...roles: string[]) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+      hasTeamRole: (minRole: string) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+      hasUserRole: (minRole: string) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
     }
     interface FastifyRequest {
         CurrentUser: UserPayload;
