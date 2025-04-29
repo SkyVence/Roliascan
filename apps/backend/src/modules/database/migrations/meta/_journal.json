@@ -8,6 +8,20 @@
       "when": 1745850856167,
       "tag": "0000_cuddly_madrox",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1745946429516,
+      "tag": "0001_legal_zodiak",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1745947980547,
+      "tag": "0002_hard_blue_marvel",
+      "breakpoints": true
     }
   ]
 }

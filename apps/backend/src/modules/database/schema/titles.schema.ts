@@ -3,6 +3,7 @@ import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import { titleStatus, titleType } from "./enum.schema";
 import { authorsTable } from "./authors.schema";
 import { usersTable } from "./users.schema";
+import { uploadTeamsTable } from "./uploadTeams.schema";
 
 export const titlesTable = pgTable("titles", {
     id: uuid("titleId").primaryKey().defaultRandom(),
@@ -13,6 +14,7 @@ export const titlesTable = pgTable("titles", {
     // Foreign keys
     authorId: uuid("authorId").references(() => authorsTable.id).notNull(),
     uploaderId: uuid("uploaderId").references(() => usersTable.id).notNull(),
+    teamId: uuid("teamId").references(() => uploadTeamsTable.id),
     
     status: titleStatus("status").notNull().default("ongoing"),
     type: titleType("type").notNull().default("manga"),

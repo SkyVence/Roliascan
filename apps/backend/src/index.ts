@@ -11,7 +11,7 @@ declare module 'fastify' {
     interface FastifyInstance {
       authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
       hasTeamRole: (minRole: string) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
-      hasUserRole: (minRole: string) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+      hasRole: (minRole: string) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
     }
     interface FastifyRequest {
         CurrentUser: UserPayload;
@@ -35,8 +35,8 @@ const initializeApp = async () => {
 
         app.log.info("[2/5] Initializing Redis...");
         redisClient = initRedisInstance(app); // Initialize Redis here
-        app.log.info("Redis dez nut")
         app.log.info("[2/5] Redis initialized.");
+        app.log.info("Redis dez nut")
 
         app.log.info("[3/5] Setting up Fastify plugins/middleware...");
         await setupFastify(app);
@@ -52,10 +52,14 @@ const initializeApp = async () => {
 
     } catch (err) {
         // Log the raw error object
-        app.log.error({ msg: "ERROR during server initialization", errorCaught: err });
+        app.log.error("ERROR during server initialization");
         // Attempt to log more details
         if (err instanceof Error) {
-            app.log.error("Error stack trace:", err);
+            app.log.error(`Error name: ${err.name}`);
+            app.log.error(`Error message: ${err.message}`);
+            app.log.error(`Error stack: ${err.stack}`);
+        } else {
+            app.log.error("Unknown error format:", err);
         }
         process.exit(1);
     }

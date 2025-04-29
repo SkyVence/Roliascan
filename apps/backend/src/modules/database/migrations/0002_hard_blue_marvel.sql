@@ -1,0 +1,1 @@
+ALTER TABLE "titles" ALTER COLUMN "teamId" DROP NOT NULL;

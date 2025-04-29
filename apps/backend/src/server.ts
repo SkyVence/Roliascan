@@ -6,6 +6,7 @@ import { AuthMiddleware, TeamRoleMiddleware, UserRoleMiddleware } from "./middle
 import { AuthController } from "./controllers/auth.controllers";
 import fastifyFormbody from "@fastify/formbody";
 import cors from "@fastify/cors";
+import { TitleController } from "./controllers/title.controllers";
 /**
  * Setup Fastify
  * @param fastify - Fastify instance
@@ -36,9 +37,13 @@ export async function setupFastify(fastify: FastifyInstance) {
  * @returns Fastify instance
  */
 export async function setupFastifyRoutes(fastify: FastifyInstance) {
-    await fastify.register(AuthController, {
-        prefix: "/auth",
-    });
+        await fastify.register(AuthController, {
+            prefix: "/auth",
+        });
+        await fastify.register(TitleController);
+        
+        // Log success
+        fastify.log.info("Routes registered successfully");
 }
 
 /**
@@ -57,7 +62,14 @@ export async function startFastify(fastify: FastifyInstance) {
         
     } catch (error) {
         // Log the error using fastify's logger and re-throw
-        fastify.log.error("Failed to start server:", error);
+        fastify.log.error("Failed to start server");
+        if (error instanceof Error) {
+            fastify.log.error(`Error name: ${error.name}`);
+            fastify.log.error(`Error message: ${error.message}`);
+            fastify.log.error(`Error stack: ${error.stack}`);
+        } else {
+            fastify.log.error("Unknown error format:", error);
+        }
         // Re-throw the error to be caught by the caller (initializeApp)
         throw error;
     }

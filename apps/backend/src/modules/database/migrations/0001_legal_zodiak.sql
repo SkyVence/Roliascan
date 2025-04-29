@@ -1,0 +1,2 @@
+ALTER TABLE "titles" ADD COLUMN "teamId" uuid NOT NULL;--> statement-breakpoint
+ALTER TABLE "titles" ADD CONSTRAINT "titles_teamId_uploadTeams_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."uploadTeams"("id") ON DELETE no action ON UPDATE no action;

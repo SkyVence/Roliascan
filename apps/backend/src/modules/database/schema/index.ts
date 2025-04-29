@@ -53,6 +53,10 @@ export const titlesRelations = relations(titlesTable, ({ one, many }) => ({
   covers: many(titleCoversTable),
   comments: many(commentsTable),
   genres: many(titleGenresTable),
+  team: one(uploadTeamsTable, {
+    fields: [titlesTable.teamId],
+    references: [uploadTeamsTable.id],
+  }),
 }));
 
 // Chapters relations
@@ -102,6 +106,7 @@ export const chapterCoverRelations = relations(chapterCoverTable, ({ one }) => (
 export const uploadTeamsRelations = relations(uploadTeamsTable, ({ many }) => ({
   chapters: many(chaptersTable),
   members: many(teamMembersTable),
+  titles: many(titlesTable),
 }));
 
 // Authors relations
