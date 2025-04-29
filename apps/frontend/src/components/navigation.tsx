@@ -3,14 +3,17 @@
 import Link from "next/link"
 import { useTheme } from "next-themes"
 import { Button } from "./ui/button"
-import { Sun, Moon, User, Loader2, Search, X } from "lucide-react"
+import { Sun, Moon, User, Search, Menu } from "lucide-react"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "./ui/dropdown-menu"
-import { useAuth } from "./auth-context"
+import { useBetterAuth } from "./authentication/better-context"
 import { AnimatedLoader } from "./ui/animated-loader"
 import { Input } from "./ui/input"
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "./ui/navigation-menu-navbar"
 import React from "react"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "./ui/sheet"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
 function ThemeSwitcher() {
     const { theme, setTheme } = useTheme()
@@ -24,14 +27,14 @@ function ThemeSwitcher() {
 }
 
 function AuthButtons() {
-    const { isAuthenticated, user, isLoading } = useAuth()
+    const { isAuthenticated, user, isLoading, logout } = useBetterAuth()
+    const router = useRouter()
 
     if (isLoading) {
         return <Button variant="outline" size="icon">
             <AnimatedLoader type="spinner" size="sm" color="primary" />
         </Button>
     }
-
 
     if (user?.role === "admin") {
         return (
@@ -54,10 +57,8 @@ function AuthButtons() {
                             Settings
                         </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <Link href="/auth/logout">
-                            Logout
-                        </Link>
+                    <DropdownMenuItem onClick={logout}>
+                        Logout
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -80,10 +81,8 @@ function AuthButtons() {
                             Settings
                         </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <Link href="/auth/logout">
-                            Logout
-                        </Link>
+                    <DropdownMenuItem onClick={logout}>
+                        Logout
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -189,15 +188,16 @@ interface BannerData {
 }
 
 export function NewNavigation() {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
     return (
         <div className="flex justify-center py-6">
             <div className="relative w-full mx-6 rounded-lg border border-primary bg-accent/60 backdrop-blur-sm px-6 py-3 shadow-md">
-                <div className="flex items-center justify-between h-[55px]">
-                    <div className="flex gap-4">
-                        <Link href="/">
+                <div className="flex items-center justify-start md:justify-between h-[55px]">
+                    <div className="flex gap-4 items-center">
+                        <Link href="/" className="hidden md:block">
                             <img src="/custom/logo4.0.png" alt="logo" className="h-[30px] w-[30px]" />
                         </Link>
-                        <NavigationMenu>
+                        <NavigationMenu className="hidden md:flex">
                             <NavigationMenuList >
                                 <NavigationMenuItem>
                                     <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
@@ -265,10 +265,46 @@ export function NewNavigation() {
                             </NavigationMenuList>
                         </NavigationMenu>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
                         <SearchBar />
                         <ThemeSwitcher />
                         <AuthButtons />
+                        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                            <SheetTrigger asChild className="md:hidden">
+                                <Button variant="outline" size="icon">
+                                    <Menu className="h-[1.2rem] w-[1.2rem]" />
+                                    <span className="sr-only">Open menu</span>
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent side="left">
+                                <SheetHeader className="sr-only">
+                                    <SheetTitle>Navigation Menu</SheetTitle>
+                                    <SheetDescription>Main site navigation links</SheetDescription>
+                                </SheetHeader>
+                                <nav className="grid gap-6 text-lg font-medium p-4">
+                                    <Link
+                                        href="/"
+                                        className="flex items-center gap-2 text-lg font-semibold mb-4"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                        <img src="/custom/logo4.0.png" alt="logo" className="h-[30px] w-[30px]" />
+                                        <span className="">Roliascan</span>
+                                    </Link>
+                                    <Link href="/" className="hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+                                    <Link href="/latest-updates" className="text-muted-foreground hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>Latest Updates</Link>
+                                    <Link href="/recommendations" className="text-muted-foreground hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>Recommendations</Link>
+                                    <Link href="/bookmarks" className="text-muted-foreground hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>Bookmarks</Link>
+                                    <h4 className="font-semibold mt-4">Categories</h4>
+                                    {categories.map((category) => (
+                                        <Link key={category.title} href={category.href} className="text-muted-foreground hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>{category.title}</Link>
+                                    ))}
+                                    <h4 className="font-semibold mt-4">Community</h4>
+                                    {community.map((item) => (
+                                        <Link key={item.title} href={item.href} className="text-muted-foreground hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>{item.title}</Link>
+                                    ))}
+                                </nav>
+                            </SheetContent>
+                        </Sheet>
                     </div>
                 </div>
             </div>

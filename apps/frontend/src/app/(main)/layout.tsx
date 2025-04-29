@@ -5,6 +5,7 @@ import AdminSidebar from "@/components/admin-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { SiteHeader } from "@/components/admin-header";
 import React from "react";
+import { Toaster } from "sonner";
 
 function RootLayoutStructure({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
+const allowedRoles = ["owner","admin", "moderator"];
+
 export default async function middleware(request: NextRequest) {
     const session = request.cookies.get('session')?.value;
     let isLoggedIn = false;
@@ -28,5 +30,3 @@ export default async function middleware(request: NextRequest) {
     }
     return NextResponse.next();
 }
-
-

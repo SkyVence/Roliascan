@@ -18,11 +18,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import axiosInstance from '@/lib/axios';
-import { AxiosError } from 'axios';
-import { toast } from "sonner";
+import { useBetterAuth } from "@/components/authentication/better-context";
 
 
 const registerSchema = z.object({
@@ -51,8 +47,7 @@ export default function RegisterForm({
     ...props
 }: React.ComponentPropsWithoutRef<"div">) {
 
-    const [isLoading, setIsLoading] = useState(false);
-    const router = useRouter();
+    const { handleAuthAction, isSubmitting } = useBetterAuth()
 
     const form = useForm<z.infer<typeof registerSchema>>({
         resolver: zodResolver(registerSchema),
@@ -60,68 +55,25 @@ export default function RegisterForm({
             username: "",
             email: "",
             password: "",
-            confirmPassword: "",
+            confirmPassword: "", 
             terms: false,
         },
     });
 
     async function onSubmit(data: RegisterFormData) {
-        setIsLoading(true);
-        form.clearErrors(); // Clear previous errors
+        const payload = {
+            username: data.username,
+            email: data.email,
+            password: data.password,
+        };
 
-        try {
-            // Use axiosInstance.post - baseURL is already configured
-            const response = await axiosInstance.post('/auth/register', {
-                username: data.username,
-                email: data.email,
-                password: data.password,
-            }, { useAuthToken: false });
-
-            // Handle success (axios resolves on 2xx status)
-            console.log("Registration successful:", response.data);
-            toast.success("Account created successfully! Redirecting to login...");
-            // Redirect user to login page after successful registration
-            setTimeout(() => {
-                router.push('/auth/login');
-            }, 1500); // 1.5 second delay
-
-        } catch (error) {
-            let errorMessage = "An unexpected error occurred during registration. Please try again.";
-
-            if (error instanceof AxiosError && error.response) {
-                // Handle errors thrown by axios (non-2xx status codes)
-                const backendError = error.response.data as { message?: string; statusCode?: number }; // Type assertion for error data
-                const backendMessage = backendError.message || 'An unknown server error occurred';
-                console.error("Registration failed:", backendMessage, "Status:", error.response.status);
-
-                if (error.response.status === 400 && backendMessage) {
-                    // Specific handling for validation errors (Bad Request)
-                    if (backendMessage.toLowerCase().includes('email')) {
-                        form.setError("email", { type: "server", message: backendMessage });
-                        errorMessage = ""; // Prevent generic alert if specific field error is set
-                    } else if (backendMessage.toLowerCase().includes('username')) {
-                        form.setError("username", { type: "server", message: backendMessage });
-                        errorMessage = ""; // Prevent generic alert if specific field error is set
-                    } else {
-                        // Other 400 errors
-                        errorMessage = `Registration failed: ${backendMessage}`;
-                    }
-                } else {
-                    // Handle other HTTP errors (e.g., 500, 401)
-                    errorMessage = `Registration failed: ${backendMessage}`;
-                }
-            } else {
-                // Handle non-axios errors (e.g., network errors, unexpected issues)
-                console.error("An unexpected error occurred:", error);
-            }
-
-            if (errorMessage) {
-                // Replace alert with toast.error
-                toast.error(errorMessage);
-            }
-        } finally {
-            setIsLoading(false);
-        }
+        await handleAuthAction(
+            '/auth/register',
+            payload,
+            form,
+            "Account created successfully! Redirecting...",
+            '/'
+        );
     }
 
     return (
@@ -202,8 +154,8 @@ export default function RegisterForm({
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Creating account..." : "Register"}
+                        <Button type="submit" className="w-full" disabled={isSubmitting}>
+                            {isSubmitting ? "Creating account..." : "Register"}
                         </Button>
                     </form>
                 </Form>

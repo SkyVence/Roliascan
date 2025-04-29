@@ -1,13 +1,16 @@
 "use client"
 import { LayoutDashboardIcon, BarChartIcon, ShieldCheckIcon, UserIcon, UploadIcon, SettingsIcon, Bug, Settings, ArrowUpCircleIcon, LucideIcon, PlusCircleIcon, MailIcon, MoreVerticalIcon, UserCircleIcon, LogOutIcon, Banknote, Sun, Moon } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarHeader, SidebarProvider, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarGroupContent, SidebarSeparator, SidebarFooter, SidebarGroupLabel } from "./ui/sidebar";
-import { useAuth } from "./auth-context";
+import { useBetterAuth } from "./authentication/better-context";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuGroup } from "./ui/dropdown-menu";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useTheme } from "next-themes";
 import { Separator } from "./ui/separator";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
+import axiosInstance from "@/lib/axios";
+import { useRouter } from "next/navigation";
 
 const data = {
     navMain: [
@@ -96,7 +99,7 @@ export default function AdminSidebar() {
                             <a href="/">
                                 <ArrowUpCircleIcon className="h-5 w-5" />
                                 <span className="text-base font-semibold">OpenMediaScan</span>
-                                <Separator orientation="vertical"/>
+                                <Separator orientation="vertical" />
                                 <span className="text-muted-foreground text-xs">Admin Panel</span>
                             </a>
                         </SidebarMenuButton>
@@ -245,9 +248,18 @@ function NavSecondary({
 }
 
 function NavUser() {
-    const { user } = useAuth()
+    const { user } = useBetterAuth()
     const [isMobile, setIsMobile] = useState(false)
     const { theme, setTheme } = useTheme()
+    const router = useRouter()
+
+    async function signOut() {
+        const res = await axiosInstance.post("/auth/logout")
+        if (res.status === 200) {
+            router.push("/auth/login")
+        }
+    }
+
     return (
         <SidebarMenu>
             <SidebarMenuItem>
@@ -284,10 +296,10 @@ function NavUser() {
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem asChild>
-                                <a href="/profile">
+                                <Link href="/profile">
                                     <UserCircleIcon />
                                     <span>Profile</span>
-                                </a>
+                                </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <a href="/profile/settings">
@@ -300,11 +312,9 @@ function NavUser() {
                                 <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                                 <span>Toggle theme</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <a href="/profile/logout">
-                                    <LogOutIcon />
-                                    <span>Logout</span>
-                                </a>
+                            <DropdownMenuItem onClick={signOut}>
+                                <LogOutIcon />
+                                <span>Logout</span>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                     </DropdownMenuContent>

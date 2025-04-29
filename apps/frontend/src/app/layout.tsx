@@ -1,6 +1,7 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
-import { AuthProvider } from "@/components/auth-context";
+import { BetterAuthProvider } from "@/components/authentication/better-context";
+import { Toaster } from "sonner";
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en" suppressHydrationWarning>
@@ -11,9 +12,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     enableSystem
                     disableTransitionOnChange
                 >
-                        <AuthProvider>
+                    <Toaster/>
+                        <BetterAuthProvider>
                             {children}
-                        </AuthProvider>
+                        </BetterAuthProvider>
                     </ThemeProvider>
             </body>
         </html>

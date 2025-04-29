@@ -17,16 +17,20 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import axiosInstance from '@/lib/axios';
-import { AxiosError } from 'axios';
-import { toast } from "sonner";
+import { useBetterAuth } from "@/components/authentication/better-context";
 
 
 const loginSchema = z.object({
-    email: z.string().email({
-        message: "Please enter a valid email address.",
+    identifier: z.union([
+        z.string().email({ message: "Please enter a valid email address." }),
+        z.string().min(3, { message: "Username must be at least 3 characters long." })
+    ], {
+        errorMap: (issue, ctx) => {
+            if (issue.code === z.ZodIssueCode.invalid_union) {
+                return { message: "Please enter a valid email or username (min 3 characters)." };
+            }
+            return { message: ctx.defaultError };
+        }
     }),
     password: z.string().min(1, {
         message: "Password is required.",
@@ -40,58 +44,30 @@ export default function LoginForm({
     ...props
 }: React.ComponentPropsWithoutRef<"div">) {
 
-    const [isLoading, setIsLoading] = useState(false);
-    const router = useRouter();
+    const { handleAuthAction, isSubmitting } = useBetterAuth()
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
-            email: "",
+            identifier: "",
             password: "",
         },
     });
 
     async function onSubmit(data: LoginFormData) {
-        setIsLoading(true);
-        form.clearErrors();
+        const isEmail = data.identifier.includes('@') && data.identifier.includes('.');
+        const payload = {
+            password: data.password,
+            ...(isEmail ? { email: data.identifier } : { username: data.identifier })
+        };
 
-        try {
-            const response = await axiosInstance.post('/auth/login', {
-                email: data.email,
-                password: data.password,
-            }, { useAuthToken: false });
-
-            console.log("Login successful:", response.data);
-            toast.success("Login successful! Redirecting...");
-
-            setTimeout(() => {
-                router.push('/');
-            }, 1500);
-
-        } catch (error) {
-            let errorMessage = "An unexpected error occurred during login. Please try again.";
-
-            if (error instanceof AxiosError && error.response) {
-                const backendError = error.response.data as { message?: string; statusCode?: number };
-                const backendMessage = backendError.message || 'An unknown server error occurred';
-                console.error("Login failed:", backendMessage, "Status:", error.response.status);
-
-                if (error.response.status === 401) {
-                    errorMessage = backendMessage || "Invalid email or password.";
-                } else if (error.response.status === 400) {
-                    errorMessage = `Login failed: ${backendMessage}`;
-                } else {
-                    errorMessage = `Login failed: ${backendMessage}`;
-                }
-            } else {
-                console.error("An unexpected error occurred:", error);
-            }
-
-            toast.error(errorMessage);
-
-        } finally {
-            setIsLoading(false);
-        }
+        await handleAuthAction(
+            '/auth/login',
+            payload,
+            form,
+            "Login successful! Redirecting...",
+            '/'
+        );
     }
 
     return (
@@ -105,12 +81,12 @@ export default function LoginForm({
                     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
                         <FormField
                             control={form.control}
-                            name="email"
+                            name="identifier"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Email</FormLabel>
+                                    <FormLabel>Email or Username</FormLabel>
                                     <FormControl>
-                                        <Input type="email" placeholder="example@email.com" {...field} />
+                                        <Input type="text" placeholder="example@email.com or username" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -129,8 +105,8 @@ export default function LoginForm({
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Logging in..." : "Login"}
+                        <Button type="submit" className="w-full" disabled={isSubmitting}>
+                            {isSubmitting ? "Logging in..." : "Login"}
                         </Button>
                     </form>
                 </Form>
