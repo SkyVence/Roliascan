@@ -1,5 +1,5 @@
-import { CreateContentForm } from "./create-content";
+import { CreateChapterForm } from "./create-chapter";
 
-export default function CreateContent() {
-    return <CreateContentForm />
+export default function CreateChapterPage() {
+    return <CreateChapterForm />
 }
