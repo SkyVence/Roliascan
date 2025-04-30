@@ -89,8 +89,9 @@ export async function AuthController(fastify: FastifyInstance) {
 
                 reply.setCookie("session", sessionId, {
                     httpOnly: true,
-                    secure: true,
-                    sameSite: "strict",
+                    secure: false,
+                    sameSite: "lax",
+                    path: '/',
                     maxAge: config.jwt.expiresIn
                 });
                 return reply.status(200).send({
@@ -186,11 +187,12 @@ export async function AuthController(fastify: FastifyInstance) {
             if (!generatedSession) {
                 return reply.status(500).send({ message: "Internal server error" });
             }
-
+            // TODO: Change Cookie settings for production
             reply.setCookie("session", sessionId, {
                 httpOnly: true,
-                secure: true,
-                sameSite: "strict",
+                secure: false,
+                sameSite: "lax",
+                path: '/',
                 maxAge: config.jwt.expiresIn
             });
 

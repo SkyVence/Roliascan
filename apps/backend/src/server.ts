@@ -7,6 +7,7 @@ import { AuthController } from "./controllers/auth.controllers";
 import fastifyFormbody from "@fastify/formbody";
 import cors from "@fastify/cors";
 import { TitleController } from "./controllers/title.controllers";
+import { AuthorController } from "./controllers/author.controllers";
 /**
  * Setup Fastify
  * @param fastify - Fastify instance
@@ -40,6 +41,7 @@ export async function setupFastifyRoutes(fastify: FastifyInstance) {
         await fastify.register(AuthController, {
             prefix: "/auth",
         });
+        await fastify.register(AuthorController);
         await fastify.register(TitleController);
         
         // Log success

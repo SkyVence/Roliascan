@@ -223,7 +223,7 @@ export async function TitleController(fastify: FastifyInstance) {
                 })
             },
         },
-        preHandler: [fastify.authenticate, fastify.hasRole("admin"), fastify.hasTeamRole("moderator")],
+        preHandler: [fastify.authenticate, fastify.hasRole("admin")],
         handler: async (request, reply) => {
             const { title, slug, description, status, type, year, chapterCount, volumeCount, authorId, uploaderId, teamId } = request.body;
             
@@ -288,7 +288,7 @@ export async function TitleController(fastify: FastifyInstance) {
                 }),
             }
         },
-        preHandler: [fastify.authenticate, fastify.hasRole("admin"), fastify.hasTeamRole("moderator")],
+        preHandler: [fastify.authenticate, fastify.hasRole("admin")],
         handler: async (request, reply) => {
             const { id } = request.params;
             const { title, slug, description, status, type, year, chapterCount, volumeCount, authorId, uploaderId, teamId } = request.body;
