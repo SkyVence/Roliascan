@@ -71,13 +71,13 @@ const data = {
     ],
     navUploads: [
         {
-            title: "Create Content",
-            url: "/admin/create-content",
+            title: "Create title",
+            url: "/admin/titles",
             icon: UploadIcon
         },
         {
-            title: "Create Chapter",
-            url: "/admin/create-chapter",
+            title: "Create author",
+            url: "/admin/authors",
             icon: UploadIcon
         },
         {
