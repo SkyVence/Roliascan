@@ -24,7 +24,7 @@ export function AuthMiddleware(fastify: FastifyInstance) {
             fastify.log.info(`Session token: ${sessionToken}`);
             if (!sessionToken) {
                 fastify.log.info("No session token found");
-                return reply.status(401).send({ message: "Unauthorized - Testing authors route" });
+                return reply.status(401).send({ message: "Unauthorized" });
             }
             const session = await verifySessionToken(sessionToken);
 
