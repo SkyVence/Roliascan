@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
 import { useBetterAuth } from "@/components/authentication/better-context";
+import { AnimatedLoader } from "@/components/ui/animated-loader";
+import { getAuthorsResponse } from "@/types/data";
 
 export function CreateChapterForm() {
     const [title, setTitle] = useState('');
@@ -22,6 +24,31 @@ export function CreateChapterForm() {
     const [teamId, setTeamId] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { user } = useBetterAuth();
+    const [isLoading, setIsLoading] = useState(false);
+    const [authors, setAuthors] = useState<getAuthorsResponse[]>([]);
+
+    useEffect(() => {
+        setIsLoading(true);
+        const fetchAuthors = async () => {
+            try {
+                const response = await axiosInstance.get('/authors');
+                setAuthors(response.data);
+            } catch (error) {
+                console.error('Error fetching authors:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchAuthors();
+    }, []);
+
+
+    if (isLoading) {
+        return <div className="flex justify-center items-center h-screen gap-2">
+            <AnimatedLoader type="spinner" />
+            <p className="text-gray-500 dark:text-gray-400">Fetching metadata...</p>
+        </div>
+    }
 
     // Simple slugify function for preview
     const slugify = (text: string): string => {
@@ -33,9 +60,7 @@ export function CreateChapterForm() {
             .replace(/[^\w\-]+/g, '') // Remove all non-word chars
             .replace(/\-\-+/g, '-'); // Replace multiple - with single -
     };
-
     const slugPreview = slugify(title);
-
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         
@@ -191,7 +216,9 @@ export function CreateChapterForm() {
                                         <SelectValue placeholder="Select author" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {/* Author dropdown with no values as requested */}
+                                        {authors.map((author) => (
+                                            <SelectItem key={author.id} value={author.id}>{author.name}</SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
