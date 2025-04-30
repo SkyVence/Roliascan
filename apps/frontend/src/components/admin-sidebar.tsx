@@ -256,7 +256,7 @@ function NavUser() {
     async function signOut() {
         const res = await axiosInstance.post("/auth/logout")
         if (res.status === 200) {
-            router.push("/auth/login")
+                router.push("/")
         }
     }
 
