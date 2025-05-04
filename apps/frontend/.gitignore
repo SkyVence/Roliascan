@@ -2,7 +2,6 @@
 
 # dependencies
 /node_modules
-**/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -17,12 +16,9 @@
 # next.js
 /.next/
 /out/
-**/.next/
 
 # production
 /build
-**/build
-**/dist
 
 # misc
 .DS_Store
@@ -32,15 +28,10 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
+.pnpm-debug.log*
 
-# env files
+# env files (can opt-in for committing if needed)
 .env*
-**/.env*
-!.env.example
-
-# Turborepo
-.turbo
 
 # vercel
 .vercel
