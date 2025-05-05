@@ -8,6 +8,6 @@ export const { GET, POST } = createRouteHandler({
   // Add basic configuration if needed
   config: {
     // Optional: Override the default callback URL if needed
-    callbackUrl: "/upload/callback"
+    callbackUrl: "/upload/callback",
   },
 });

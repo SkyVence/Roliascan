@@ -13,7 +13,7 @@ const getUser = async (req: Request) => {
       headers: req.headers,
     });
     const response = await auth.handler(authRequest);
-    
+
     if (response.ok) {
       const data = await response.json();
       return data.user;
@@ -42,10 +42,10 @@ export const ourFileRouter = {
       console.log("Image file url:", file.ufsUrl);
       // Store file.url in your database as needed
     }),
-  
+
   // Chapter content uploader for manga/comic pages
   chapterContentUploader: f({
-    image: { maxFileSize: "8MB", maxFileCount: 50 }
+    image: { maxFileSize: "8MB", maxFileCount: 50 },
   })
     .middleware(async ({ req }) => {
       // Authenticate the user
@@ -55,13 +55,15 @@ export const ourFileRouter = {
       return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Chapter content upload complete for userId:", metadata.userId);
+      console.log(
+        "Chapter content upload complete for userId:",
+        metadata.userId,
+      );
       console.log("Chapter content file url:", file.ufsUrl);
       console.log("Chapter content file key:", file.key);
       // The URL and key should be used when creating or updating chapter content
       // via the chapter API endpoints
     }),
-
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;
