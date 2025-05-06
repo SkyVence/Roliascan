@@ -1,22 +1,25 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import AppHeader from "@/components/header/app-header";
+import AppProvider from "@/components/app-provider";
+import { Toaster } from "sonner";
 export const metadata: Metadata = {
-  title: "OpenMediaScan",
-  description: "Read your favorite manga, manhwa, manhua, and more.",
+    title: "OpenMediaScan",
+    description: "Read your favorite manga, manhwa, manhua, and more.",
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" className="dark">
-      <body>
-        <AppHeader />
-        {children}
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en" suppressHydrationWarning>
+            <body>
+                <AppProvider>
+                    <Toaster />
+                    {children}
+                </AppProvider>
+            </body>
+        </html>
+    );
 }

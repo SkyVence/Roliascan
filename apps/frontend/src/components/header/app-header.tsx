@@ -1,244 +1,221 @@
-"use client";
-import Link from "next/link";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
-import { cn } from "@/lib/utils";
-import React from "react";
-import {
-  Book,
-  Home,
-  LibraryBig,
-  LogIn,
-  Menu,
-  MessageSquare,
-  UserPlus,
-} from "lucide-react";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "../ui/sheet";
-import { Button } from "../ui/button";
-const genres = [
-  {
-    title: "Action",
-    href: "/genres/action",
-    description:
-      "Exciting stories filled with combat, conflict, and adventure.",
-  },
-  {
-    title: "Romance",
-    href: "/genres/romance",
-    description: "Stories that focus on romantic relationships and love.",
-  },
-  {
-    title: "Fantasy",
-    href: "/genres/fantasy",
-    description:
-      "Magical worlds, mythical creatures, and supernatural elements.",
-  },
-  {
-    title: "Sci-Fi",
-    href: "/genres/sci-fi",
-    description:
-      "Futuristic technology, space exploration, and scientific concepts.",
-  },
-  {
-    title: "Horror",
-    href: "/genres/horror",
-    description: "Frightening stories designed to scare and unsettle readers.",
-  },
-  {
-    title: "Comedy",
-    href: "/genres/comedy",
-    description: "Humorous stories meant to entertain and make readers laugh.",
-  },
-];
+"use client"
 
-const categories = [
-  {
-    title: "Manga",
-    href: "/categories/manga",
-    description: "Japanese comics with a distinctive art style.",
-  },
-  {
-    title: "Manhua",
-    href: "/categories/manhua",
-    description: "Chinese comics with unique storytelling approaches.",
-  },
-  {
-    title: "Manhwa",
-    href: "/categories/manhwa",
-    description: "Korean comics, often in full color and read top to bottom.",
-  },
-  {
-    title: "Comics",
-    href: "/categories/comics",
-    description: "Western-style comics from various publishers.",
-  },
-];
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { BookOpen, Cog, LogOut, Menu, Moon, Search, Sun, User, UserPlus } from "lucide-react"
+import { useState } from "react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useTheme } from "next-themes"
+import { authClient, signOut, useSession } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
 
-export default function AppHeader() {
-  return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2">
-          <LibraryBig className="h-6 w-6" />
-          <span className="text-lg font-semibold">OpenMediaScan</span>
-        </div>
-        {/* Mobile Menu */}
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="lg:hidden">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left">
-            <div className="flex flex-col gap-6 py-6">
-              <div className="flex items-center gap-2">
-                <LibraryBig className="h-6 w-6" />
-                <span className="text-lg font-semibold">OpenMediaScan</span>
-              </div>
-              <nav className="flex flex-col gap-4">
-                <SheetClose asChild>
-                  <Link href="/" className="flex items-center gap-2">
-                    <Home className="h-6 w-6" />
-                    <span>Home</span>
-                  </Link>
-                </SheetClose>
-                <SheetClose asChild>
-                  <Link href="/categories" className="flex items-center gap-2">
-                    <Book className="h-6 w-6" />
-                    <span>Categories</span>
-                  </Link>
-                </SheetClose>
-                <SheetClose asChild>
-                  <Link href="/genres" className="flex items-center gap-2">
-                    <Book className="h-6 w-6" />
-                    <span>Genres</span>
-                  </Link>
-                </SheetClose>
-                <SheetClose asChild>
-                  <Link href="/socials" className="flex items-center gap-2">
-                    <MessageSquare className="h-6 w-6" />
-                    <span>Socials</span>
-                  </Link>
-                </SheetClose>
-              </nav>
-              <div className="flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-2"
-                >
-                  <LogIn className="h-4 w-4" />
-                  Login
-                </Button>
-                <Button className="w-full justify-start gap-2">
-                  <UserPlus className="h-4 w-4" />
-                  Register
-                </Button>
-              </div>
+export function AppHeader() {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+    return (
+        <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-sm">
+            <div className="container mx-auto px-4">
+                <div className="grid grid-cols-12 h-16 items-center gap-4">
+                    {/* Logo Section - 2 columns on md+ screens */}
+                    <div className="col-span-6 md:col-span-2 flex items-center gap-2">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="md:hidden"
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        >
+                            <Menu className="h-5 w-5" />
+                            <span className="sr-only">Toggle menu</span>
+                        </Button>
+                        <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+                            <BookOpen className="h-6 w-6 text-primary" />
+                            <span>OpenMediaScan</span>
+                        </Link>
+                    </div>
+
+                    {/* Nav Links - 6 columns, centered, hidden on mobile */}
+                    <div className="hidden md:flex md:col-span-6 items-center justify-center space-x-6">
+                        <Link href="/browse" className="text-sm font-medium hover:text-primary transition-colors">
+                            Browse
+                        </Link>
+                        <Link href="/latest" className="text-sm font-medium hover:text-primary transition-colors">
+                            Latest
+                        </Link>
+                        <Link href="/popular" className="text-sm font-medium hover:text-primary transition-colors">
+                            Popular
+                        </Link>
+                        <Link href="/genres" className="text-sm font-medium hover:text-primary transition-colors">
+                            Genres
+                        </Link>
+                    </div>
+
+                    {/* Search and Account - 4 columns, right-aligned */}
+                    <div className="col-span-6 md:col-span-4 flex items-center justify-end gap-4">
+                        <form className="relative hidden md:block flex-grow max-w-[300px]">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                type="search"
+                                placeholder="Search manga..."
+                                className="w-full bg-muted border-border pl-8 text-sm"
+                            />
+                        </form>
+                        <AccountButton />
+                    </div>
+                </div>
             </div>
-          </SheetContent>
-        </Sheet>
-      </div>
-    </header>
-  );
+
+            {/* Mobile menu */}
+            {isMobileMenuOpen && (
+                <div className="md:hidden border-t border-border bg-background">
+                    <nav className="flex flex-col p-4 space-y-3">
+                        <Link
+                            href="/browse"
+                            className="text-sm font-medium hover:text-primary transition-colors p-2"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            Browse
+                        </Link>
+                        <Link
+                            href="/latest"
+                            className="text-sm font-medium hover:text-primary transition-colors p-2"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            Latest
+                        </Link>
+                        <Link
+                            href="/popular"
+                            className="text-sm font-medium hover:text-primary transition-colors p-2"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            Popular
+                        </Link>
+                        <Link
+                            href="/genres"
+                            className="text-sm font-medium hover:text-primary transition-colors p-2"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            Genres
+                        </Link>
+                        <form className="relative mt-2">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                type="search"
+                                placeholder="Search manga..."
+                                className="w-full bg-muted border-border pl-8 text-sm"
+                            />
+                        </form>
+                    </nav>
+                </div>
+            )}
+        </header>
+    )
 }
 
-function NavMenu() {
-  return (
-    <NavigationMenu>
-      <NavigationMenuList>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Categories</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              {categories.map((category) => (
-                <ListItem
-                  key={category.title}
-                  title={category.title}
-                  href={category.href}
-                >
-                  {category.description}
-                </ListItem>
-              ))}
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Genres</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              {genres.map((genre) => (
-                <ListItem
-                  key={genre.title}
-                  title={genre.title}
-                  href={genre.href}
-                >
-                  {genre.description}
-                </ListItem>
-              ))}
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Socials</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              <ListItem title="Discord" href="#DiscordLink">
-                Join our community on Discord.
-              </ListItem>
-              <ListItem title="Twitter" href="#TwitterLink">
-                Follow us on Twitter.
-              </ListItem>
-              <ListItem title="Instagram" href="#InstagramLink">
-                Follow us on Instagram.
-              </ListItem>
-              <ListItem title="TikTok" href="#TikTokLink">
-                Follow us on TikTok.
-              </ListItem>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
-  );
+function AccountBtnContent() {
+    const session = useSession()
+    const router = useRouter()
+
+    const admin = session.data?.user.role === "admin"
+
+    if (session.data) {
+        return (
+            <>
+                <DropdownMenuLabel>
+                    <div className="flex items-center justify-center gap-2 w-full">
+                        <User className="h-4 w-4 flex-shrink-0" />
+                        <span className="text-sm truncate">{session.data?.user.name}</span>
+                    </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                    <Link href="/user/profile">
+                        <User className="h-4 w-4" />
+                        <span>Profile</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/settings">
+                        <Cog className="h-4 w-4" />
+                        <span>Settings</span>
+                    </Link>
+                </DropdownMenuItem>
+                <ThemeToggle />
+                <DropdownMenuItem onClick={() => {
+                    signOut().then(() => {
+                        router.refresh();
+                    });
+                }}>
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
+                </DropdownMenuItem>
+                {admin && (
+                    <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                            <Link href="/admin/dashboard">
+                                <User className="h-4 w-4" />
+                                <span>Admin Dashboard</span>
+                            </Link>
+                        </DropdownMenuItem>
+                    </>
+                )}
+            </>
+        )
+    }
+
+    return (
+        <>
+            <DropdownMenuLabel>
+                <div className="flex items-center justify-center gap-2 w-half">
+                    <span className="text-sm truncate">Account</span>
+                </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+                <Link href="/auth/sign-up">
+                    <UserPlus className="h-4 w-4" />
+                    <span>Register</span>
+                </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+                <Link href="/auth/sign-in">
+                    <User className="h-4 w-4" />
+                    <span>Login</span>
+                </Link>
+            </DropdownMenuItem>
+            <ThemeToggle />
+        </>
+    )
 }
 
-const ListItem = React.forwardRef<
-  React.ElementRef<typeof Link>,
-  Omit<React.ComponentPropsWithoutRef<typeof Link>, "ref">
->(({ className, title, children, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-800 hover:text-purple-400 focus:bg-gray-800 focus:text-purple-400",
-            className,
-          )}
-          ref={ref}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-gray-400">
-            {children}
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = "ListItem";
+function AccountButton() {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground ml-auto">
+                    <User className="h-5 w-5 hidden md:block" />
+                    <span className="sr-only">Account</span>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                <AccountBtnContent />
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
+
+function ThemeToggle() {
+    const { theme, setTheme } = useTheme()
+
+    return (
+        <DropdownMenuItem onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+            {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+            ) : (
+                <Moon className="h-5 w-5" />
+            )}
+            <span>{theme === "dark" ? "Light" : "Dark"}</span>
+        </DropdownMenuItem>
+    )
+}
