@@ -65,6 +65,11 @@ async function GET(request: NextRequest, response: NextResponse) {
         with: {
           socials: true,
         },
+        columns: {
+            id: true,
+            name: true,
+            description: true,
+        },
         orderBy: (author) => [author.name],
       });
 

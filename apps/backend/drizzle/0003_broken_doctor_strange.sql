@@ -1,1 +1,0 @@
-DROP TABLE "api"."temp_upload" CASCADE;

@@ -1,6 +1,6 @@
 import db from "@/lib/db";
 import { z } from "zod";
-import { title, titleLinks, titleToGenre } from "@/lib/db/schema/schema";
+import { title, titleLinks, titleToGenre, titleStatus, titleType } from "@/lib/db/schema/schema";
 import { eq, and, inArray, sql, count } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -263,8 +263,6 @@ async function PATCH(request: NextRequest, response: NextResponse) {
     if (data.name !== undefined) updates.name = data.name;
     if (data.description !== undefined) updates.description = data.description;
     if (data.authorId !== undefined) updates.authorId = data.authorId;
-    if (data.status !== undefined) updates.status = data.status;
-    if (data.type !== undefined) updates.type = data.type;
 
     // Update the title if there are any fields to update
     if (Object.keys(updates).length > 1) {

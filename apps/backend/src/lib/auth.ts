@@ -24,5 +24,10 @@ export const auth = betterAuth({
         enabled: true,
     }
   },
+  cors: {
+    enabled: true,
+    origin: process.env.NEXT_PUBLIC_FRONTEND_URL,
+    credentials: true,
+  },
   trustedOrigins: ["http://localhost:3001"],
 });

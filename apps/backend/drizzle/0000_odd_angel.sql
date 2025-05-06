@@ -1,5 +1,7 @@
 CREATE SCHEMA "api";
 --> statement-breakpoint
+CREATE TYPE "api"."titleStatus" AS ENUM('ongoing', 'completed', 'cancelled', 'hiatus');--> statement-breakpoint
+CREATE TYPE "api"."titleType" AS ENUM('manga', 'manhwa', 'manhua', 'comic', 'other');--> statement-breakpoint
 CREATE TABLE "api"."account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
@@ -62,6 +64,34 @@ CREATE TABLE "api"."genre" (
 	"updated_at" timestamp NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "api"."invitation" (
+	"id" text PRIMARY KEY NOT NULL,
+	"organization_id" text NOT NULL,
+	"email" text NOT NULL,
+	"role" text,
+	"status" text NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"inviter_id" text NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "api"."member" (
+	"id" text PRIMARY KEY NOT NULL,
+	"organization_id" text NOT NULL,
+	"user_id" text NOT NULL,
+	"role" text NOT NULL,
+	"created_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "api"."organization" (
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"slug" text,
+	"logo" text,
+	"created_at" timestamp NOT NULL,
+	"metadata" text,
+	CONSTRAINT "organization_slug_unique" UNIQUE("slug")
+);
+--> statement-breakpoint
 CREATE TABLE "api"."session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"expires_at" timestamp NOT NULL,
@@ -71,6 +101,8 @@ CREATE TABLE "api"."session" (
 	"ip_address" text,
 	"user_agent" text,
 	"user_id" text NOT NULL,
+	"active_organization_id" text,
+	"impersonated_by" text,
 	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
@@ -80,7 +112,9 @@ CREATE TABLE "api"."title" (
 	"description" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
-	"author_id" uuid
+	"author_id" uuid,
+	"status" "api"."titleStatus" DEFAULT 'ongoing',
+	"type" "api"."titleType" DEFAULT 'manga'
 );
 --> statement-breakpoint
 CREATE TABLE "api"."title_links" (
@@ -103,11 +137,15 @@ CREATE TABLE "api"."user" (
 	"name" text NOT NULL,
 	"email" text NOT NULL,
 	"email_verified" boolean NOT NULL,
-	"username" text NOT NULL,
-	"display_username" text NOT NULL,
+	"username" text,
+	"display_username" text,
 	"image" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
+	"role" text NOT NULL,
+	"banned" boolean DEFAULT false NOT NULL,
+	"ban_reason" text,
+	"ban_expires" date,
 	CONSTRAINT "user_email_unique" UNIQUE("email"),
 	CONSTRAINT "user_username_unique" UNIQUE("username")
 );
@@ -126,6 +164,10 @@ ALTER TABLE "api"."author_socials" ADD CONSTRAINT "author_socials_author_id_auth
 ALTER TABLE "api"."chapter" ADD CONSTRAINT "chapter_title_id_title_id_fk" FOREIGN KEY ("title_id") REFERENCES "api"."title"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "api"."chapter" ADD CONSTRAINT "chapter_uploaded_by_user_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "api"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "api"."chapter_content" ADD CONSTRAINT "chapter_content_chapter_id_chapter_id_fk" FOREIGN KEY ("chapter_id") REFERENCES "api"."chapter"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "api"."invitation" ADD CONSTRAINT "invitation_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "api"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "api"."invitation" ADD CONSTRAINT "invitation_inviter_id_user_id_fk" FOREIGN KEY ("inviter_id") REFERENCES "api"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "api"."member" ADD CONSTRAINT "member_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "api"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "api"."member" ADD CONSTRAINT "member_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "api"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "api"."session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "api"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "api"."title" ADD CONSTRAINT "title_author_id_author_id_fk" FOREIGN KEY ("author_id") REFERENCES "api"."author"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "api"."title_links" ADD CONSTRAINT "title_links_title_id_title_id_fk" FOREIGN KEY ("title_id") REFERENCES "api"."title"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
