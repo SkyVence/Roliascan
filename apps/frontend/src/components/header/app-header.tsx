@@ -124,7 +124,7 @@ function AccountBtnContent() {
                 <DropdownMenuLabel>
                     <div className="flex items-center justify-center gap-2 w-full">
                         <User className="h-4 w-4 flex-shrink-0" />
-                        <span className="text-sm truncate">{session.data?.user.name}</span>
+                        <span className="text-sm truncate">{session.data?.user.displayUsername ?? session.data?.user.name}</span>
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />

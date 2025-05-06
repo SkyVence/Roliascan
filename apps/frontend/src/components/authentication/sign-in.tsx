@@ -10,15 +10,19 @@ import { Loader2, Key } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
-export default function SignIn() {
+export default function SignIn({
+    className,
+    ...props
+}: React.ComponentPropsWithoutRef<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   return (
-    <Card className="max-w-md">
+    <Card className={cn("w-full max-w-sm", className)} {...props}>
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
         <CardDescription className="text-xs md:text-sm">
@@ -104,13 +108,13 @@ export default function SignIn() {
                 <p> Login </p>
               )}
               </Button>
-
-          
-
-          
         </div>
       </CardContent>
-      
-    </Card>
+      <CardFooter>
+        <p className="text-center text-xs text-neutral-500">
+            No account? <Link href="/auth/sign-up" className="text-orange-400">Sign up</Link>
+        </p>
+      </CardFooter>
+      </Card>
   );
 }

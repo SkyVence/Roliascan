@@ -17,8 +17,13 @@ import { Loader2, X } from "lucide-react";
 import { signUp } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
-export default function SignUp() {
+export default function SignUp({
+    className,
+    ...props
+}: React.ComponentPropsWithoutRef<"div">) {
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
 	const [email, setEmail] = useState("");
@@ -42,7 +47,7 @@ export default function SignUp() {
 	};
 
 	return (
-		<Card className="z-50 rounded-md rounded-t-none max-w-md">
+		<Card className={cn("z-50 rounded-md rounded-t-none max-w-md", className)} {...props}>
 			<CardHeader>
 				<CardTitle className="text-lg md:text-xl">Sign Up</CardTitle>
 				<CardDescription className="text-xs md:text-sm">
@@ -184,7 +189,7 @@ export default function SignUp() {
 			<CardFooter>
 				<div className="flex justify-center w-full border-t py-4">
 					<p className="text-center text-xs text-neutral-500">
-						Secured by <span className="text-orange-400">better-auth.</span>
+						Have an account? <Link href="/auth/sign-in" className="text-orange-400">Sign in</Link>
 					</p>
 				</div>
 			</CardFooter>
