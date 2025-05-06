@@ -157,6 +157,8 @@ async function POST(request: NextRequest, response: NextResponse) {
       authorId: data.authorId,
       createdAt: now,
       updatedAt: now,
+      status: data.status,
+      type: data.type,
     };
 
     const createdTitles = await db.insert(title).values(titleData).returning();
@@ -261,6 +263,8 @@ async function PATCH(request: NextRequest, response: NextResponse) {
     if (data.name !== undefined) updates.name = data.name;
     if (data.description !== undefined) updates.description = data.description;
     if (data.authorId !== undefined) updates.authorId = data.authorId;
+    if (data.status !== undefined) updates.status = data.status;
+    if (data.type !== undefined) updates.type = data.type;
 
     // Update the title if there are any fields to update
     if (Object.keys(updates).length > 1) {

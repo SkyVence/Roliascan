@@ -32,6 +32,8 @@ type TitleTables = {
   titleLinksRelations: any;
   titleToGenre: any;
   titleToGenreRelations: any;
+  titleStatus: any;
+  titleType: any;
 };
 
 type ChapterTables = {
@@ -75,6 +77,8 @@ export const {
   titleLinksRelations,
   titleToGenre,
   titleToGenreRelations,
+  titleStatus,
+  titleType,
 } = titleTables;
 export const {
   chapter,

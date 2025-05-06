@@ -7,10 +7,13 @@ import {
   varchar,
   PgTableWithColumns,
   primaryKey,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { author, chapter, genre, titleLinks } from "./schema";
 
 export const defineTitleTables = (schema: PgSchema<any>) => {
+  const titleStatus = schema.enum("titleStatus", ["ongoing", "completed", "cancelled", "hiatus"]);
+  const titleType = schema.enum("titleType", ["manga", "manhwa", "manhua", "comic", "other"]);
   const title = schema.table("title", {
     id: uuid("id").primaryKey().defaultRandom(),
     name: varchar("name", { length: 255 }).notNull(),
@@ -20,6 +23,8 @@ export const defineTitleTables = (schema: PgSchema<any>) => {
     authorId: uuid("author_id").references(() => author.id, {
       onDelete: "cascade",
     }),
+    status: titleStatus("status").default("ongoing"),
+    type: titleType("type").default("manga"),
   });
   const titleRelations = relations(title, ({ one, many }) => ({
     author: one(author, {
@@ -79,5 +84,7 @@ export const defineTitleTables = (schema: PgSchema<any>) => {
     titleLinksRelations,
     titleToGenre,
     titleToGenreRelations,
+    titleStatus,
+    titleType,
   };
 };

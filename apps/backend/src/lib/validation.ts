@@ -6,6 +6,8 @@ export const createTitleRequestSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
   authorId: z.string().uuid(),
+  status: z.enum(["ongoing", "completed", "cancelled", "hiatus"]).optional(),
+  type: z.enum(["manga", "manhwa", "manhua", "comic", "other"]).optional(),
   links: z.array(
     z.object({
       name: z.string().min(1),
@@ -20,6 +22,8 @@ export const updateTitleRequestSchema = z.object({
   name: z.string().min(1).optional(),
   description: z.string().optional().nullable(),
   authorId: z.string().uuid().optional(),
+  status: z.enum(["ongoing", "completed", "cancelled", "hiatus"]).optional(),
+  type: z.enum(["manga", "manhwa", "manhua", "comic", "other"]).optional(),
   links: z
     .array(
       z.object({
