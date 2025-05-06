@@ -6,6 +6,7 @@ import {
   boolean,
   integer,
   PgSchema,
+  date,
 } from "drizzle-orm/pg-core";
 import { chapter } from "./schema";
 
@@ -15,11 +16,15 @@ export const defineAuthTables = (schema: PgSchema<any>) => {
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
     emailVerified: boolean("email_verified").notNull(),
-    username: text("username").notNull().unique(),
-    displayUsername: text("display_username").notNull(),
+    username: text("username").unique(),
+    displayUsername: text("display_username"),
     image: text("image"),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
+    role: text("role").notNull(),
+    banned: boolean("banned").notNull().default(false),
+    banReason: text("ban_reason"),
+    banExpires: date("ban_expires"),
   });
   const userRelations = relations(user, ({ many }) => ({
     chapters: many(chapter),
@@ -36,6 +41,7 @@ export const defineAuthTables = (schema: PgSchema<any>) => {
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     activeOrganizationId: text("active_organization_id"),
+    impersonatedBy: text("impersonated_by"),
   });
 
   const account = schema.table("account", {

@@ -26,7 +26,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  allowedDevOrigins: ["http://api.linheberg.fr"],
 };
 
 export default nextConfig;
