@@ -266,6 +266,7 @@ function ChangePasswordForm() {
             await authClient.changePassword({
                 currentPassword: data.currentPassword,
                 newPassword: data.newPassword,
+                revokeOtherSessions: true,
             });
             toast.success("Password changed successfully");
             form.reset();
