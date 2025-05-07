@@ -27,7 +27,14 @@ async function GET(request: NextRequest, response: NextResponse) {
       const titleData = await db.query.title.findFirst({
         where: eq(title.id, titleId),
         with: {
-          author: true,
+          author: {
+            columns: {
+              id: true,
+              name: true,
+              createdAt: true,
+              updatedAt: true
+            }
+          },
           links: true,
           genres: {
             with: {
@@ -36,6 +43,15 @@ async function GET(request: NextRequest, response: NextResponse) {
           },
           chapters: true,
         },
+        columns: {
+          id: true,
+          name: true,
+          description: true,
+          status: true,
+          type: true,
+          createdAt: true,
+          updatedAt: true
+        }
       });
 
       if (!titleData) {

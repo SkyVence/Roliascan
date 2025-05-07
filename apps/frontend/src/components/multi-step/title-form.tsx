@@ -14,6 +14,8 @@ import axios from "axios";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Card, CardTitle, CardDescription, CardHeader, CardContent } from "../ui/card";
+import FormProgress from "@/components/forms/form-progress";
 
 // Combine schemas from individual forms (assuming they exist and can be imported)
 // This is a placeholder and will need to be adjusted based on the actual schemas
@@ -23,7 +25,7 @@ const combinedSchema = z.object({
         description: z.string().optional(),
         type: z.string().min(1, "Type is required"),
         status: z.string().min(1, "Status is required"),
-        links: z.array(z.object({ 
+        links: z.array(z.object({
             type: z.string(),
             url: z.string().url("Please enter a valid URL")
         })).optional(),
@@ -59,9 +61,10 @@ const TitleForm = () => {
     const multiStepFormRef = useRef<MultiStepFormRef>(null);
     const [authors, setAuthors] = useState<any[]>([]);
     const [genres, setGenres] = useState<any[]>([]);
+    const [currentStep, setCurrentStep] = useState(0);
     const router = useRouter();
 
-        const methods = useForm<CombinedFormData>({
+    const methods = useForm<CombinedFormData>({
         resolver: zodResolver(combinedSchema),
         defaultValues: {
             basicInfo: {
@@ -93,10 +96,10 @@ const TitleForm = () => {
 
     const onSubmit = async (data: CombinedFormData) => {
         console.log("Form data:", data);
-        
+
         try {
             let authorId = "";
-            
+
             // Handle author creation if needed
             if (data.authorInfo.authorOption === "new" && data.authorInfo.newAuthor) {
                 try {
@@ -105,7 +108,7 @@ const TitleForm = () => {
                         description: data.authorInfo.newAuthor.description || "",
                         socials: data.authorInfo.newAuthor.links || []
                     };
-                    
+
                     const authorRes = await api.post("/author", authorData);
                     authorId = authorRes.data.author.id;
                     toast.success("Author created successfully");
@@ -117,27 +120,27 @@ const TitleForm = () => {
             } else if (data.authorInfo.authorOption === "existing") {
                 authorId = data.authorInfo.existingAuthor || "";
             }
-            
+
             // Check if we have a valid author ID
             if (!authorId) {
                 toast.error("Author is required");
                 return;
             }
-            
+
             // Handle genre creation if needed
             let genreIds: string[] = [];
-            
+
             if (data.genreInfo.genreOption === "existing" && data.genreInfo.existingGenres) {
                 genreIds = data.genreInfo.existingGenres;
             }
-            
+
             if (data.genreInfo.genreOption === "new" && data.genreInfo.newGenre?.name) {
                 try {
                     const genreData = {
                         name: data.genreInfo.newGenre.name,
                         description: data.genreInfo.newGenre.description || ""
                     };
-                    
+
                     const genreRes = await api.post("/genre", genreData);
                     genreIds = [genreRes.data.genre.id];
                     toast.success("Genre created successfully");
@@ -147,7 +150,7 @@ const TitleForm = () => {
                     return; // Stop form submission if genre creation fails
                 }
             }
-            
+
             // Create the title with gathered information
             const titleData = {
                 name: data.basicInfo.name,
@@ -161,14 +164,14 @@ const TitleForm = () => {
                     url: link.url
                 })) : []
             };
-            
+
             const titleRes = await api.post("/title", titleData);
             toast.success("Title created successfully");
-            
+
             // Optionally redirect or reset form
             methods.reset();
             router.push(`/admin/chapters/${titleRes.data.title.id}`);
-            
+
         } catch (error) {
             console.error("Error submitting form:", error);
             toast.error("Failed to create title");
@@ -181,15 +184,15 @@ const TitleForm = () => {
         try {
             const res = await api.get("/author");
             console.log("Author API response:", res);
-            
+
             // Extract authors array from the specific response structure
             const authorsData = res.data.authors || [];
-            
+
             const authorsPayload = authorsData.map((author: { id: string; name: string }) => ({
                 id: author.id,
                 name: author.name
             }));
-                
+
             console.log("Processed authors payload:", authorsPayload);
             setAuthors(authorsPayload);
         } catch (err) {
@@ -223,6 +226,10 @@ const TitleForm = () => {
         getGenres();
     }, []);
 
+    const handleStepChange = (step: number) => {
+        setCurrentStep(step);
+    };
+
     const steps = [
         {
             name: "Basic Information",
@@ -239,30 +246,44 @@ const TitleForm = () => {
     ];
 
     return (
-        <div className="p-4">
-            <MultiStepForm
-                ref={multiStepFormRef}
-                schema={combinedSchema}
-                methods={methods}
-                steps={steps}
-                onSubmit={onSubmit}
-                controls={[
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => multiStepFormRef.current?.handleBack()}
-                    >
-                        Back
-                    </Button>,
-                    <Button
-                        type="button"
-                        onClick={() => multiStepFormRef.current?.handleNext()}
-                    >
-                        Next
-                    </Button>,
-                ]}
-            />
-        </div>
+        <Card>
+            <CardHeader>
+                <CardDescription>Follow the steps below to create a new title</CardDescription>
+                <CardTitle>Creating title: {methods.watch("basicInfo.name") || "Untitled"}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="flex flex-col gap-4">
+                    <FormProgress 
+                        currentStage={currentStep}
+                        totalStages={steps.length}
+                        steps={steps}
+                    />
+                    <MultiStepForm
+                        ref={multiStepFormRef}
+                        schema={combinedSchema}
+                        methods={methods}
+                        steps={steps}
+                        onSubmit={onSubmit}
+                        onStepChange={handleStepChange}
+                        controls={[
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => multiStepFormRef.current?.handleBack()}
+                            >
+                                Back
+                            </Button>,
+                            <Button
+                                type="button"
+                                onClick={() => multiStepFormRef.current?.handleNext()}
+                            >
+                                Next
+                            </Button>,
+                        ]}
+                    />
+                </div>
+            </CardContent>
+        </Card>
     );
 };
 
