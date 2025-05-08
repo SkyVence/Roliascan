@@ -1,7 +1,7 @@
 "use client"
 import { useParams } from "next/navigation"
 import { any, z } from "zod";
-import InvalidParams from "@/components/invalid/params";
+import InvalidParams from "@/components/error/params";
 import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";

@@ -14,7 +14,7 @@ import axios from "axios";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Card, CardTitle, CardDescription, CardHeader, CardContent } from "../ui/card";
+import { Card, CardTitle, CardDescription, CardHeader, CardContent } from "../../ui/card";
 import FormProgress from "@/components/forms/form-progress";
 
 // Combine schemas from individual forms (assuming they exist and can be imported)

@@ -1,4 +1,4 @@
-import TitleForm from "@/components/multi-step/title-form"
+import TitleForm from "@/components/forms/title-form-multi-step/title-form"
 
 export default function TitlePage() {
     return (
