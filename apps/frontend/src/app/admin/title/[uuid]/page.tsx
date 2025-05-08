@@ -5,6 +5,7 @@ import InvalidParams from "@/components/invalid/params";
 import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { CompactCard, CompactCardContent } from "@/components/ui/compact-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft, Calendar, FileText, Link2, User } from "lucide-react";
@@ -12,8 +13,6 @@ import { Edit } from "lucide-react";
 import { Trash } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns"
-import { Avatar } from "@/components/ui/avatar";
-import { title } from "process";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 const apiResObject = z.object({
@@ -21,6 +20,7 @@ const apiResObject = z.object({
         id: z.string().uuid(),
         name: z.string(),
         description: z.string().optional(),
+        imageUrl: z.string().url().optional(),
         createdAt: z.date(),
         updatedAt: z.date(),
         status: z.enum(["ongoing", "completed", "hiatus", "cancelled"]),
@@ -108,26 +108,34 @@ export default function TitlePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2 space-y-6">
-                        <Card>
-                            <CardHeader>
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <Skeleton className="h-8 w-[250px] mb-2" />
-                                        <div className="flex gap-2">
-                                            <Skeleton className="h-6 w-[80px]" />
-                                            <Skeleton className="h-6 w-[80px]" />
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <CompactCard className="md:col-span-1">
+                                <CompactCardContent className="p-0">
+                                    <Skeleton className="w-full aspect-[2/3] rounded-xl" />
+                                </CompactCardContent>
+                            </CompactCard>
+
+                            <Card className="md:col-span-3">
+                                <CardHeader>
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <Skeleton className="h-8 w-[250px] mb-2" />
+                                            <div className="flex gap-2">
+                                                <Skeleton className="h-6 w-[80px]" />
+                                                <Skeleton className="h-6 w-[80px]" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-4 w-[150px]" />
+                                            <Skeleton className="h-4 w-[150px]" />
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Skeleton className="h-4 w-[150px]" />
-                                        <Skeleton className="h-4 w-[150px]" />
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <Skeleton className="h-20 w-full" />
-                            </CardContent>
-                        </Card>
+                                </CardHeader>
+                                <CardContent>
+                                    <Skeleton className="h-20 w-full" />
+                                </CardContent>
+                            </Card>
+                        </div>
 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between">
@@ -271,32 +279,52 @@ export default function TitlePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <CardTitle className="text-2xl">{titleInfo?.title.name}</CardTitle>
-                                    <CardDescription>
-                                        <div className="flex gap-2 mt-2">
-                                            <Badge>
-                                                {titleInfo?.title?.status ? titleInfo.title.status.charAt(0).toUpperCase() + titleInfo.title.status.slice(1) : "Unknown"}
-                                            </Badge>
-                                            <Badge>
-                                                {titleInfo?.title?.type ? titleInfo.title.type.charAt(0).toUpperCase() + titleInfo.title.type.slice(1) : "Unknown"}
-                                            </Badge>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <CompactCard className="md:col-span-1">
+                            <CompactCardContent className="p-0">
+                                <div className="relative w-full aspect-[2/3]">
+                                    {titleInfo?.title.imageUrl ? (
+                                        <img
+                                            src={titleInfo.title.imageUrl}
+                                            alt={titleInfo.title.name}
+                                            className="object-cover w-full h-full rounded-xl"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-muted rounded-xl flex items-center justify-center">
+                                            <FileText className="h-12 w-12 text-muted-foreground" />
                                         </div>
-                                    </CardDescription>
+                                    )}
                                 </div>
-                                <div className="text-sm text-muted-foreground">
-                                    <div>Created: {titleInfo?.title?.createdAt ? new Date(titleInfo.title.createdAt).toLocaleString() : 'N/A'}</div>
-                                    <div>Updated: {titleInfo?.title?.updatedAt ? new Date(titleInfo.title.updatedAt).toLocaleString() : 'N/A'}</div>
+                            </CompactCardContent>
+                        </CompactCard>
+
+                        <Card className="md:col-span-3">
+                            <CardHeader>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <CardTitle className="text-2xl">{titleInfo?.title.name}</CardTitle>
+                                        <CardDescription>
+                                            <div className="flex gap-2 mt-2">
+                                                <Badge>
+                                                    {titleInfo?.title?.status ? titleInfo.title.status.charAt(0).toUpperCase() + titleInfo.title.status.slice(1) : "Unknown"}
+                                                </Badge>
+                                                <Badge>
+                                                    {titleInfo?.title?.type ? titleInfo.title.type.charAt(0).toUpperCase() + titleInfo.title.type.slice(1) : "Unknown"}
+                                                </Badge>
+                                            </div>
+                                        </CardDescription>
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                        <div>Created: {titleInfo?.title?.createdAt ? new Date(titleInfo.title.createdAt).toLocaleString() : 'N/A'}</div>
+                                        <div>Updated: {titleInfo?.title?.updatedAt ? new Date(titleInfo.title.updatedAt).toLocaleString() : 'N/A'}</div>
+                                    </div>
                                 </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">{titleInfo?.title?.description || "No description available."}</p>
-                        </CardContent>
-                    </Card>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground">{titleInfo?.title?.description || "No description available."}</p>
+                            </CardContent>
+                        </Card>
+                    </div>
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
