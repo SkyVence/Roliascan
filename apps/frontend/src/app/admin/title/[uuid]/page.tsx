@@ -15,6 +15,7 @@ import { format } from "date-fns"
 import { Avatar } from "@/components/ui/avatar";
 import { title } from "process";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 const apiResObject = z.object({
     title: z.object({
         id: z.string().uuid(),
@@ -53,7 +54,7 @@ const apiResObject = z.object({
     })
 })
 
-export default function ChapterPage() {
+export default function TitlePage() {
     const [titleInfo, setTitleInfo] = useState<z.infer<typeof apiResObject>>();
     const [loading, setLoading] = useState(false);
     const params = useParams<{ uuid: string }>();
@@ -76,6 +77,170 @@ export default function ChapterPage() {
             setLoading(false);
         });
     }, []);
+
+    if (loading) {
+        return (
+            <div className="container mx-auto py-6 space-y-6">
+                <div className="flex justify-between items-center">
+                    <div className="flex flex-col gap-2">
+                        <Skeleton className="h-8 w-[300px]" />
+                        <Skeleton className="h-4 w-[200px]" />
+                    </div>
+                    <div className="flex gap-2">
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href="/admin/titles">
+                                <ArrowLeft className="mr-2 h-4 w-4" />
+                                Back
+                            </Link>
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href={`/admin/titles/${params.uuid}/edit`}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                            </Link>
+                        </Button>
+                        <Button variant="destructive" size="sm">
+                            <Trash className="mr-2 h-4 w-4" />
+                            Delete
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="md:col-span-2 space-y-6">
+                        <Card>
+                            <CardHeader>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <Skeleton className="h-8 w-[250px] mb-2" />
+                                        <div className="flex gap-2">
+                                            <Skeleton className="h-6 w-[80px]" />
+                                            <Skeleton className="h-6 w-[80px]" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-[150px]" />
+                                        <Skeleton className="h-4 w-[150px]" />
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <Skeleton className="h-20 w-full" />
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle className="text-xl">Chapters</CardTitle>
+                                    <CardDescription>
+                                        <Skeleton className="h-4 w-[200px] mt-2" />
+                                    </CardDescription>
+                                </div>
+                                <Button size="sm" asChild>
+                                    <Link href={`/admin/titles/${params.uuid}/chapters/create`}>Add Chapter</Link>
+                                </Button>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-2">
+                                    {[1, 2, 3].map((i) => (
+                                        <Skeleton key={i} className="h-12 w-full" />
+                                    ))}
+                                </div>
+                            </CardContent>
+                            <CardFooter>
+                                <Button variant="outline" size="sm" className="w-full" asChild>
+                                    <Link href={`/admin/titles/${params.uuid}/chapters`}>View All Chapters</Link>
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </div>
+
+                    <div className="space-y-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-xl">Author</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="flex items-start gap-3">
+                                    <User className="h-10 w-10 rounded-full bg-muted p-2" />
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-[150px]" />
+                                        <Skeleton className="h-4 w-[200px]" />
+                                    </div>
+                                </div>
+                            </CardContent>
+                            <CardFooter>
+                                <Button variant="outline" size="sm" className="w-full">
+                                    <Skeleton className="h-4 w-[100px]" />
+                                </Button>
+                            </CardFooter>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-xl">Genres</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="flex flex-wrap gap-2">
+                                    {[1, 2, 3, 4].map((i) => (
+                                        <Skeleton key={i} className="h-6 w-[80px]" />
+                                    ))}
+                                </div>
+                            </CardContent>
+                            <CardFooter>
+                                <Button variant="outline" size="sm" className="w-full" asChild>
+                                    <Link href={`/admin/titles/${params.uuid}/edit-genres`}>Edit Genres</Link>
+                                </Button>
+                            </CardFooter>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-xl">External Links</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-2">
+                                    {[1, 2].map((i) => (
+                                        <Skeleton key={i} className="h-12 w-full" />
+                                    ))}
+                                </div>
+                            </CardContent>
+                            <CardFooter>
+                                <Button variant="outline" size="sm" className="w-full" asChild>
+                                    <Link href={`/admin/titles/${params.uuid}/add-link`}>Add Link</Link>
+                                </Button>
+                            </CardFooter>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-xl">Metadata</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between">
+                                        <span className="text-sm text-muted-foreground">ID:</span>
+                                        <Skeleton className="h-4 w-[200px]" />
+                                    </div>
+                                    <Separator />
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-muted-foreground">Created:</span>
+                                        <Skeleton className="h-4 w-[100px]" />
+                                    </div>
+                                    <Separator />
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-muted-foreground">Updated:</span>
+                                        <Skeleton className="h-4 w-[100px]" />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="container mx-auto py-6 space-y-6">
